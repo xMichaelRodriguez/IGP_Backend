@@ -10,6 +10,12 @@ const storiesSchema = new Schema({
     type: String,
     require: true,
   },
+
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
 });
 
 storiesSchema.method("toJSON", function () {

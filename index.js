@@ -4,7 +4,7 @@ import cors from "cors";
 
 //Rutas
 import authRouter from "./routes/auth.js";
-import storiesRouter from "./routes/authEvents.js";
+import storiesRouter from "./routes/stories.js";
 dotenv.config();
 
 //database
