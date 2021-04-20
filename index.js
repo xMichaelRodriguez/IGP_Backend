@@ -30,9 +30,8 @@ app.use(express.static("public"));
 // Lectura y parseo del body
 app.use(express.json());
 
-
 //socket.io
-connectionSocket(http,io)
+connectionSocket(http, io);
 
 // Rutas
 app.use("/api/auth", authRouter);
