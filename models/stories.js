@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
-const { Schema } = mongoose;
+const { Schema, model } = require("mongoose");
+
 
 const storiesSchema = new Schema({
   title: {
@@ -24,4 +24,4 @@ storiesSchema.method("toJSON", function () {
   return object;
 });
 
-export const Story = mongoose.model("Story", storiesSchema);
+module.exports =model("Story", storiesSchema);

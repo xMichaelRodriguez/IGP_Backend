@@ -3,13 +3,14 @@
         host * api/stories
 
 */
-
-import { Router } from "express";
-import { check } from "express-validator";
-import constroller from "../controllers/stories.js";
-import { validarCampos } from "../helpers/validar-campos.js";
-import { validarJWT } from "../middleware/tovenValid.js";
+const { Router } = require("express");
+const { check } = require("express-validator");
+const constroller = require("../controllers/stories");
+const validarCampos = require("../helpers/validar-campos");
+const validarJWT = require("../middleware/tovenValid");
 const router = Router();
+
+
 
 router.use(validarJWT);
 
@@ -48,5 +49,4 @@ router.put(
   constroller.editStorie
 );
 router.delete("/:id", constroller.deleteStorie);
-
-export default router;
+module.exports = router;

@@ -1,13 +1,14 @@
-import { response } from "express";
-import bcrypt from "bcryptjs";
+const { response } = require("express");
+const bcrypt = require("bcryptjs");
 
-import { User } from "../models/auth.js";
-import { generarJWT } from "../helpers/jwt.js";
+const User = require("../models/auth.js");
+const { generarJWT } = require("../helpers/jwt.js");
 
-export const login = async (req, res = response) => {
+const login = async (req, res = response) => {
   const { email, password } = req.body;
 
   try {
+    console.log(email, password);
     const userSchema = await User.findOne({ email });
 
     if (!userSchema) {
@@ -43,6 +44,6 @@ export const login = async (req, res = response) => {
   }
 };
 
-export default {
+module.exports = {
   login,
 };

@@ -1,16 +1,17 @@
-import { response } from "express";
-import { Story } from "../models/stories.js";
+const { response } = require("express");
+const Story = require("../models/stories");
 
-export const getStories = async (req, res = response) => {
+const socket = require("../socket").socket;
+const getStories = async (req, res = response) => {
+  socket.io.emit("message", "hola mundo");
   const stories = await Story.find();
-
   res.json({
     ok: true,
     stories,
   });
 };
 
-export const newStorie = async (req, res = response) => {
+const newStorie = async (req, res = response) => {
   const story = new Story(req.body);
   try {
     story.user = req.uid;
@@ -29,7 +30,7 @@ export const newStorie = async (req, res = response) => {
   }
 };
 
-export const editStorie = async (req, res = response) => {
+const editStorie = async (req, res = response) => {
   const storyId = req.params.id;
   const uid = req.uid;
 
@@ -71,7 +72,7 @@ export const editStorie = async (req, res = response) => {
   }
 };
 
-export const deleteStorie = async (req, res = response) => {
+const deleteStorie = async (req, res = response) => {
   const storyId = req.params.id;
   const uid = req.uid;
 
@@ -106,7 +107,7 @@ export const deleteStorie = async (req, res = response) => {
   }
 };
 
-export default {
+module.exports = {
   getStories,
   newStorie,
   editStorie,

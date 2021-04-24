@@ -1,22 +1,17 @@
-import express from "express";
-import dotenv from "dotenv";
-import cors from "cors";
-import http from "http";
-import io from "socket.io";
-
-//Rutas
-import authRouter from "./routes/auth.js";
-import storiesRouter from "./routes/stories.js";
-dotenv.config();
-
-//database
-import { dbConnection } from "./database/config.js";
-import { connectionSocket } from "./controllers/sockets.js";
-
+const express = require("express");
 // Crear el servidor de express
 const app = express();
+const server = require("http").createServer(app);
 
-http.Server(app);
+const dotenv = require("dotenv").config();
+const cors = require("cors");
+
+//Rutas
+const authRouter = require("./routes/auth.js");
+const storiesRouter=require("./routes/stories")
+//database
+const { dbConnection } = require("./database/config.js");
+const socket = require("./socket.js");
 
 // Base de datos
 dbConnection();
@@ -31,13 +26,13 @@ app.use(express.static("public"));
 app.use(express.json());
 
 //socket.io
-connectionSocket(http, io);
+socket.connect(server);
 
 // Rutas
 app.use("/api/auth", authRouter);
 app.use("/api/stories", storiesRouter);
 
 // Escuchar peticiones
-app.listen(process.env.PORT, () => {
+server.listen(process.env.PORT, () => {
   console.log(`Servidor corriendo en puerto ${process.env.PORT}`);
 });
