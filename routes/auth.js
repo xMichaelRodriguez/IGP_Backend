@@ -4,10 +4,10 @@
 
 */
 
-import { Router } from "express";
-import constroller from "../controllers/auth.js";
+const { Router } = require("express");
+const constroller = require("../controllers/auth.js");
 const router = Router();
 
 router.post("/", constroller.login);
 
-export default router;
+module.exports = router;
