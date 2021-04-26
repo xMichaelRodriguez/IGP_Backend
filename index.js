@@ -8,7 +8,8 @@ const cors = require("cors");
 
 //Rutas
 const authRouter = require("./routes/auth.js");
-const storiesRouter=require("./routes/stories")
+const storiesRouter = require("./routes/stories");
+const noticeRouter = require("./routes/notice");
 //database
 const { dbConnection } = require("./database/config.js");
 const socket = require("./socket.js");
@@ -31,6 +32,7 @@ socket.connect(server);
 // Rutas
 app.use("/api/auth", authRouter);
 app.use("/api/stories", storiesRouter);
+app.use("/api/noticies", noticeRouter);
 
 // Escuchar peticiones
 server.listen(process.env.PORT, () => {

@@ -3,7 +3,7 @@ const Story = require("../models/stories");
 
 const socket = require("../socket").socket;
 const getStories = async (req, res = response) => {
-  socket.io.emit("message", "hola mundo");
+ 
   const stories = await Story.find();
   res.json({
     ok: true,
