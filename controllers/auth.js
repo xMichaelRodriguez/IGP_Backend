@@ -43,7 +43,20 @@ const login = async (req, res = response) => {
     });
   }
 };
+const revalidarToken = async (req, res = response) => {
+  const { uid, name } = req;
 
+  // Generar JWT
+  const token = await generarJWT(uid, name);
+
+  res.json({
+    ok: true,
+    token,
+    uid,
+    name,
+  });
+};
 module.exports = {
   login,
+  revalidarToken
 };
