@@ -1,10 +1,10 @@
 const { response } = require("express");
 const Notice = require("../models/notice");
 const getNoticies = async (req, res = response) => {
-  const Noticies = await Notice.find();
+  const noticies = await Notice.find();
   res.json({
     ok: true,
-    Noticies,
+    noticies,
   });
 };
 
