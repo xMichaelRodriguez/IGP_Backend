@@ -7,6 +7,13 @@ const getNoticies = async (req, res = response) => {
     noticies,
   });
 };
+const getLastedNoticies = async (req, res = response) => {
+  const noticies = await Notice.find().sort({ x: -1 }).limit(10);
+  res.json({
+    ok: true,
+    noticies,
+  });
+};
 
 const newNotice = async (req, res = response) => {
   try {
@@ -111,4 +118,5 @@ module.exports = {
   newNotice,
   editNotice,
   deleteNotice,
+  getLastedNoticies,
 };

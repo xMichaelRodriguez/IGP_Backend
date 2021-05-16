@@ -7,6 +7,7 @@ const constroller = require("../controllers/noticies");
 const router = Router();
 
 router.get("/", constroller.getNoticies);
+router.get("/lastest", constroller.getLastedNoticies);
 
 router.use(validarJWT);
 router.post(
