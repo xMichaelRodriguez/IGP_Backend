@@ -10,8 +10,6 @@ const validarCampos = require("../helpers/validar-campos");
 const validarJWT = require("../middleware/tovenValid");
 const router = Router();
 
-
-
 router.use(validarJWT);
 
 router.get("/", constroller.getStories);
