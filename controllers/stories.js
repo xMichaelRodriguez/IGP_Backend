@@ -4,19 +4,39 @@ const Story = require("../models/stories");
 const socket = require("../socket").socket;
 
 const getStoriesPagination = async (req, res) => {
-  const { limit, skip } = req.query;
-
   try {
-    const stories = await Story.find()
-      .skip(parseInt(skip))
-      .limit(parseInt(limit));
+    let { page } = req.query;
+
+    //Recoger Pagina actual
+    if (!page || page === "0" || page === null || page === undefined) {
+      page = 1;
+    } else {
+      page = parseInt(page);
+    }
+
+    //indicar las opciones de paginacion
+    const options = {
+      sort: { date: -1 },
+      limit: 6,
+      page,
+    };
+
+    //find Paginado
+    const stories = await Story.paginate({}, options);
+
+    if (!stories) {
+      return res.status(404).json({ ok: false, msg: "No hay historias" });
+    }
+    
     return res.status(200).json({
       ok: true,
-      stories,
+      stories: stories.docs,
+      total_docs: stories.totalDocs,
+      total_page: stories.totalPages,
     });
   } catch (err) {
     console.log(err);
-    return res.status(200).json({ ok: true, err });
+    return res.status(200).json({ ok: false, err });
   }
 };
 

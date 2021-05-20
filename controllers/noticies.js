@@ -2,13 +2,34 @@ const { response } = require("express");
 const Notice = require("../models/notice");
 const getNoticies = async (req, res = response) => {
   try {
-    const { skip, limit } = req.query;
-    const noticies = await Notice.find()
-      .skip(parseInt(skip))
-      .limit(parseInt(limit));
+    let { page } = req.query;
+
+    //Recoger Pagina actual
+    if (!page || page === "0" || page === null || page === undefined) {
+      page = 1;
+    } else {
+      page = parseInt(page);
+    }
+
+    //indicar las opciones de paginacion
+    const options = {
+      sort: { date: -1 },
+      limit: 6,
+      page,
+    };
+
+    //find Paginado
+    const noticies = await Notice.paginate({}, options);
+
+    if (!noticies) {
+      return res.status(404).json({ ok: false, msg: "No hay noticias" });
+    }
+
     res.json({
       ok: true,
-      noticies,
+      noticies: noticies.docs,
+      total_docs: noticies.totalDocs,
+      total_page: noticies.totalPages,
     });
   } catch (error) {}
 };

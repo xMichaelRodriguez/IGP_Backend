@@ -1,5 +1,5 @@
 const { Schema, model } = require("mongoose");
-
+const mongoosePagination = require("mongoose-paginate-v2");
 const storiesSchema = new Schema({
   title: {
     type: String,
@@ -10,6 +10,10 @@ const storiesSchema = new Schema({
     require: true,
   },
 
+  date: {
+    type: String,
+    require: true,
+  },
   user: {
     type: Schema.Types.ObjectId,
     ref: "User",
@@ -22,5 +26,8 @@ storiesSchema.method("toJSON", function () {
   object.id = _id;
   return object;
 });
+
+// load Pagination
+storiesSchema.plugin(mongoosePagination);
 
 module.exports = model("Story", storiesSchema);

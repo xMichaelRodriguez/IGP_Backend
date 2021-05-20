@@ -8,6 +8,7 @@ const { check } = require("express-validator");
 const constroller = require("../controllers/stories");
 const validarCampos = require("../helpers/validar-campos");
 const validarJWT = require("../middleware/tovenValid");
+const { isDate } = require("../helpers/isDate");
 const router = Router();
 
 router.use(validarJWT);
@@ -17,15 +18,16 @@ router.post(
   "/new",
   [
     //middleware
-    check("title", "Mandatory title and minimum of 6 characters")
+    check("title", "Título obligatorio y mínimo de 6 caracteres")
       .notEmpty()
       .isLength({ min: 6 }),
     check(
       "body",
-      "Mandatory body and minimum of 50 characters and maximum of 2000 characters "
+      "Cuerpo obligatorio y mínimo de 50 caracteres y máximo de 2000 caracteres "
     )
       .notEmpty()
       .isLength({ min: 50, max: 2000 }),
+    check("date", "Fecha de inicio es obligatoria").custom(isDate),
     validarCampos,
   ],
   constroller.newStorie
@@ -33,15 +35,17 @@ router.post(
 router.put(
   "/:id", //middleware
   [
-    check("title", "Mandatory title and minimum of 6 characters")
+    //middleware
+    check("title", "Título obligatorio y mínimo de 6 caracteres")
       .notEmpty()
       .isLength({ min: 6 }),
     check(
       "body",
-      "Mandatory body and minimum of 50 characters and maximum of 2000 characters "
+      "Cuerpo obligatorio y mínimo de 50 caracteres y máximo de 2000 caracteres "
     )
       .notEmpty()
       .isLength({ min: 50, max: 2000 }),
+    check("date", "Fecha de inicio es obligatoria").custom(isDate),
     validarCampos,
   ],
   constroller.editStorie
