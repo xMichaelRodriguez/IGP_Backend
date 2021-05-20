@@ -1,18 +1,28 @@
 const { response } = require("express");
 const Notice = require("../models/notice");
 const getNoticies = async (req, res = response) => {
-  const noticies = await Notice.find();
-  res.json({
-    ok: true,
-    noticies,
-  });
+  try {
+    const { skip, limit } = req.query;
+    const noticies = await Notice.find()
+      .skip(parseInt(skip))
+      .limit(parseInt(limit));
+    res.json({
+      ok: true,
+      noticies,
+    });
+  } catch (error) {}
 };
 const getLastedNoticies = async (req, res = response) => {
-  const noticies = await Notice.find().sort({ x: -1 }).limit(10);
-  res.json({
-    ok: true,
-    noticies,
-  });
+  try {
+    const noticies = await Notice.find().sort({ x: -1 }).limit(10);
+    res.json({
+      ok: true,
+      noticies,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ ok: false, msg: "Algo Salio Mal :(" });
+  }
 };
 
 const newNotice = async (req, res = response) => {

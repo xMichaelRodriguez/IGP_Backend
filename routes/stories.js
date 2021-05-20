@@ -12,7 +12,7 @@ const router = Router();
 
 router.use(validarJWT);
 
-router.get("/", constroller.getStories);
+router.get("/", constroller.getStoriesPagination);
 router.post(
   "/new",
   [

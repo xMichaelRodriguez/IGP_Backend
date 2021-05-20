@@ -1,14 +1,23 @@
-const { response } = require("express");
+const { response, json } = require("express");
 const Story = require("../models/stories");
 
 const socket = require("../socket").socket;
-const getStories = async (req, res = response) => {
- 
-  const stories = await Story.find();
-  res.json({
-    ok: true,
-    stories,
-  });
+
+const getStoriesPagination = async (req, res) => {
+  const { limit, skip } = req.query;
+
+  try {
+    const stories = await Story.find()
+      .skip(parseInt(skip))
+      .limit(parseInt(limit));
+    return res.status(200).json({
+      ok: true,
+      stories,
+    });
+  } catch (err) {
+    console.log(err);
+    return res.status(200).json({ ok: true, err });
+  }
 };
 
 const newStorie = async (req, res = response) => {
@@ -108,8 +117,8 @@ const deleteStorie = async (req, res = response) => {
 };
 
 module.exports = {
-  getStories,
   newStorie,
   editStorie,
   deleteStorie,
+  getStoriesPagination,
 };
