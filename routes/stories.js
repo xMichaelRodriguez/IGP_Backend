@@ -11,9 +11,11 @@ const validarJWT = require("../middleware/tovenValid");
 const { isDate } = require("../helpers/isDate");
 const router = Router();
 
+router.get("/", constroller.getStoriesPagination);
+router.get("/:storyId", constroller.findOneStory);
+
 router.use(validarJWT);
 
-router.get("/", constroller.getStoriesPagination);
 router.post(
   "/new",
   [
@@ -27,7 +29,7 @@ router.post(
     )
       .notEmpty()
       .isLength({ min: 50, max: 2000 }),
-    check("date", "Fecha de inicio es obligatoria").custom(isDate),
+    check("date", "Fecha  es obligatoria").custom(isDate),
     validarCampos,
   ],
   constroller.newStorie

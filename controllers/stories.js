@@ -40,6 +40,27 @@ const getStoriesPagination = async (req, res) => {
   }
 };
 
+const findOneStory = async (req, res) => {
+  try {
+    //storyId
+    const { storyId } = req.params;
+    //find ONee
+    const stories = await Story.findById(storyId);
+
+    if (!stories) {
+      return res.status(404).json({ ok: false, msg: "No hay historias" });
+    }
+
+    return res.status(200).json({
+      ok: true,
+      stories,
+    });
+  } catch (err) {
+    console.log(err);
+    return res.status(200).json({ ok: false, err });
+  }
+};
+
 const newStorie = async (req, res = response) => {
   const story = new Story(req.body);
   try {
@@ -141,4 +162,5 @@ module.exports = {
   editStorie,
   deleteStorie,
   getStoriesPagination,
+  findOneStory,
 };

@@ -17,7 +17,6 @@ const getNoticies = async (req, res = response) => {
       limit: 6,
       page,
     };
-
     //find Paginado
     const noticies = await Notice.paginate({}, options);
 
@@ -33,9 +32,9 @@ const getNoticies = async (req, res = response) => {
     });
   } catch (error) {}
 };
-const getLastedNoticies = async (req, res = response) => {
+const findById = async (req, res = response) => {
   try {
-    const noticies = await Notice.find().sort({ x: -1 }).limit(10);
+    const noticies = await Notice.findById(req.params.noticeId);
     res.json({
       ok: true,
       noticies,
@@ -62,7 +61,7 @@ const newNotice = async (req, res = response) => {
     console.log(error);
     return res.status(400).json({
       ok: false,
-      msg: error,
+      msg: "Algo Salio Mal :(",
     });
   }
 };
@@ -72,7 +71,7 @@ const editNotice = async (req, res = response) => {
 
   try {
     const EditedNotice = await Notice.findById(noticeId);
-    console.log(EditedNotice);
+
     if (!EditedNotice) {
       return res.status(404).json({
         ok: false,
@@ -98,7 +97,7 @@ const editNotice = async (req, res = response) => {
 
     res.json({
       ok: true,
-      notice: noticeUpdated,
+      noticies: noticeUpdated,
     });
   } catch (error) {
     console.log(error);
@@ -149,5 +148,5 @@ module.exports = {
   newNotice,
   editNotice,
   deleteNotice,
-  getLastedNoticies,
+  findById,
 };

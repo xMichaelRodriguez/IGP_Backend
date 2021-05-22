@@ -8,7 +8,7 @@ const { isDate } = require("../helpers/isDate");
 const router = Router();
 
 router.get("/", constroller.getNoticies);
-router.get("/lastest", constroller.getLastedNoticies);
+router.get("/:noticeId", constroller.findById);
 
 router.use(validarJWT);
 router.post(
@@ -24,7 +24,7 @@ router.post(
     )
       .notEmpty()
       .isLength({ min: 50, max: 2000 }),
-    check("date", "Fecha de inicio es obligatoria").custom(isDate),
+    check("date", "Fecha es obligatoria").custom(isDate),
     validarCampos,
   ],
   constroller.newNotice

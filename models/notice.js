@@ -9,6 +9,10 @@ const noticeSchema = new Schema({
     type: String,
     require: true,
   },
+  date: {
+    type: String,
+    require: true,
+  },
 
   user: {
     type: Schema.Types.ObjectId,
