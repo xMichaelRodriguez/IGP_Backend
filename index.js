@@ -27,7 +27,7 @@ app.use(express.static("public"));
 app.use(express.json());
 
 //socket.io
-socket.connect(server);
+//socket.connect(server);
 
 // Rutas
 app.use("/api/auth", authRouter);
