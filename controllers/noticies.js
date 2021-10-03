@@ -50,7 +50,6 @@ const getNoticies = async (req, res = response) => {
           $lte: end,
         },
       }
-      console.log(query)
       noticies = await Notice.paginate(query, options)
     }
 
