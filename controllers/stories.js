@@ -1,17 +1,21 @@
-const { response, json } = require("express");
-const Story = require("../models/stories");
-
-const socket = require("../socket").socket;
+const { response } = require('express')
+const moment = require('moment')
+const Story = require('../models/stories')
 
 const getStoriesPagination = async (req, res) => {
   try {
-    let { page } = req.query;
+    let { page, startDate, endDate } = req.query
 
     //Recoger Pagina actual
-    if (!page || page === "0" || page === null || page === undefined) {
-      page = 1;
+    if (
+      !page ||
+      page === '0' ||
+      page === null ||
+      page === undefined
+    ) {
+      page = 1
     } else {
-      page = parseInt(page);
+      page = parseInt(page)
     }
 
     //indicar las opciones de paginacion
@@ -19,143 +23,187 @@ const getStoriesPagination = async (req, res) => {
       sort: { date: -1 },
       limit: 6,
       page,
-    };
+    }
 
     //find Paginado
-    const stories = await Story.paginate({}, options);
+    let stories = null
+    if (
+      (!startDate && !endDate) ||
+      (startDate === '0' && endDate === '0') ||
+      (startDate === null && endDate === null) ||
+      (startDate === undefined && endDate === undefined)
+    ) {
+      const query = {}
+
+      stories = await Story.paginate(query, options)
+    } else {
+      const start = moment(startDate)
+        .toISOString()
+        .toString()
+
+      const end = moment(endDate)
+        .toLocaleString()
+        .toString()
+
+      const query = {
+        date: {
+          $gte: start,
+          $lte: end,
+        },
+      }
+
+      stories = await Story.paginate(query, options)
+    }
 
     if (!stories) {
-      return res.status(404).json({ ok: false, msg: "No hay historias" });
+      return res
+        .status(404)
+        .json({ ok: false, msg: 'No hay historias' })
     }
-    
-    return res.status(200).json({
-      ok: true,
-      stories: stories.docs,
-      total_docs: stories.totalDocs,
-      total_page: stories.totalPages,
-    });
+
+    if (stories.docs.length < 6) {
+      return res.status(200).json({
+        ok: true,
+        stories: stories.docs,
+        total_docs: stories.totalDocs,
+        total_page: 1,
+      })
+    } else {
+      return res.status(200).json({
+        ok: true,
+        stories: stories.docs,
+        total_docs: stories.totalDocs,
+        total_page: stories.totalDocs,
+      })
+    }
   } catch (err) {
-    console.log(err);
-    return res.status(200).json({ ok: false, err });
+    console.log(err)
+    return res.status(200).json({ ok: false, err })
   }
-};
+}
 
 const findOneStory = async (req, res) => {
   try {
     //storyId
-    const { storyId } = req.params;
+    const { storyId } = req.params
     //find ONee
-    const stories = await Story.findById(storyId);
+    const stories = await Story.findById(storyId)
 
     if (!stories) {
-      return res.status(404).json({ ok: false, msg: "No hay historias" });
+      return res
+        .status(404)
+        .json({ ok: false, msg: 'No hay historias' })
     }
 
     return res.status(200).json({
       ok: true,
       stories,
-    });
+    })
   } catch (err) {
-    console.log(err);
-    return res.status(200).json({ ok: false, err });
+    console.log(err)
+    return res.status(200).json({ ok: false, err })
   }
-};
+}
 
 const newStorie = async (req, res = response) => {
-  const story = new Story(req.body);
+  const story = new Story(req.body)
   try {
-    story.user = req.uid;
-    const storySaved = await story.save();
+    story.user = req.uid
+    const storySaved = await story.save()
 
     return res.json({
       ok: true,
       story: storySaved,
-    });
+    })
   } catch (error) {
-    console.log(error);
+    console.log(error)
     res.status(500).json({
       ok: false,
-      msg: "something went wrong",
-    });
+      msg: 'something went wrong',
+    })
   }
-};
+}
 
 const editStorie = async (req, res = response) => {
-  const storyId = req.params.id;
-  const uid = req.uid;
+  const storyId = req.params.id
+  const uid = req.uid
 
   try {
-    const story = await Story.findById(storyId);
+    const story = await Story.findById(storyId)
     if (!story) {
       return res.status(404).json({
         ok: false,
-        msg: "This story does not exist with that ID",
-      });
+        msg: 'This story does not exist with that ID',
+      })
     }
 
     if (story.user.toString() !== uid) {
       return res.status(401).json({
         ok: false,
-        msg: "You do not have the privilege to edit this story",
-      });
+        msg: 'You do not have the privilege to edit this story',
+      })
     }
 
     const newStory = {
       ...req.body,
       user: uid,
-    };
+    }
 
-    const StoryUpdated = await Story.findByIdAndUpdate(storyId, newStory, {
-      new: true,
-    });
+    const StoryUpdated = await Story.findByIdAndUpdate(
+      storyId,
+      newStory,
+      {
+        new: true,
+      }
+    )
 
     res.json({
       ok: true,
       story: StoryUpdated,
-    });
+    })
   } catch (error) {
-    console.log(error);
+    console.log(error)
     res.status(500).json({
       ok: false,
-      msg: "Something went wrong",
-    });
+      msg: 'Something went wrong',
+    })
   }
-};
+}
 
 const deleteStorie = async (req, res = response) => {
-  const storyId = req.params.id;
-  const uid = req.uid;
+  const storyId = req.params.id
+  const uid = req.uid
 
   try {
-    const story = await Story.findById(storyId);
+    const story = await Story.findById(storyId)
     if (!story) {
       return res.status(404).json({
         ok: false,
-        msg: "This story does not exist with that ID",
-      });
+        msg: 'This story does not exist with that ID',
+      })
     }
 
     if (story.user.toString() !== uid) {
       return res.status(401).json({
         ok: false,
-        msg: "You do not have the privilege to edit this story",
-      });
+        msg: 'You do not have the privilege to edit this story',
+      })
     }
 
-    await Story.findByIdAndDelete(storyId);
+    await Story.findByIdAndDelete(storyId)
 
     res.json({
       ok: true,
-      msg: "Story Deleted",
-    });
+      msg: 'Story Deleted',
+    })
   } catch (error) {
-    console.log(error);
+    console.log(error)
     res.status(500).json({
       ok: false,
-      msg: "Something went wrong",
-    });
+      msg: 'Something went wrong',
+    })
   }
-};
+}
 
 module.exports = {
   newStorie,
@@ -163,4 +211,4 @@ module.exports = {
   deleteStorie,
   getStoriesPagination,
   findOneStory,
-};
+}
