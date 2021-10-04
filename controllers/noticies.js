@@ -40,9 +40,7 @@ const getNoticies = async (req, res = response) => {
         .toISOString()
         .toString()
 
-      const end = moment(endDate)
-        .toLocaleString()
-        .toString()
+      const end = moment(endDate).toISOString().toString()
 
       const query = {
         date: {

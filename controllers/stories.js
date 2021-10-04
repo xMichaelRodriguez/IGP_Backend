@@ -41,9 +41,7 @@ const getStoriesPagination = async (req, res) => {
         .toISOString()
         .toString()
 
-      const end = moment(endDate)
-        .toLocaleString()
-        .toString()
+      const end = moment(endDate).toISOString().toString()
 
       const query = {
         date: {
