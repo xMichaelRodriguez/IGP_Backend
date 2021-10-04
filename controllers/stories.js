@@ -73,7 +73,7 @@ const getStoriesPagination = async (req, res) => {
         ok: true,
         stories: stories.docs,
         total_docs: stories.totalDocs,
-        total_page: stories.totalDocs,
+        total_page: stories.totalPages,
       })
     }
   } catch (err) {
