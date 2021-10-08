@@ -23,14 +23,15 @@ const getAllOrganizations = async (
     })
   }
 }
+
 const findByIdOrg = async (
   req = request,
   res = response
 ) => {
   try {
-    const result = await organization.findById(
-      req.params.orgId
-    )
+    const result = await organization.find({
+      acronym: req.params.orgId,
+    })
     if (!result) {
       return res.status(404).json({
         ok: false,
