@@ -1,6 +1,12 @@
+const Story = require('../models/stories')
+const fs = require('fs-extra')
 const { response } = require('express')
 const moment = require('moment')
-const Story = require('../models/stories')
+
+const {
+  deleteImageCloud,
+  uploadImageToCloud,
+} = require('../helpers/uploadImages')
 
 const getStoriesPagination = async (req, res) => {
   try {
@@ -104,24 +110,36 @@ const findOneStory = async (req, res) => {
 }
 
 const newStorie = async (req, res = response) => {
-  console.log(req.body)
-  console.log(req.file)
-  // const story = new Story(req.body)
-  // try {
-  //   story.user = req.uid
-  //   const storySaved = await story.save()
+  const { path } = req.file
+  try {
+    const { error, resp } = await uploadImageToCloud(path)
+    if (error) {
+      return res
+        .status(404)
+        .json({ ok: false, msg: resp, error })
+    }
 
-  //   return res.json({
-  //     ok: true,
-  //     story: storySaved,
-  //   })
-  // } catch (error) {
-  //   console.log(error)
-  //   res.status(500).json({
-  //     ok: false,
-  //     msg: 'something went wrong',
-  //   })
-  // }
+    const story = new Story({
+      ...req.body,
+      imageUrl: resp.secure_url,
+      publicImg_id: resp.public_id,
+    })
+    story.user = req.uid
+    const storySaved = await story.save()
+
+    await fs.unlink(path)
+
+    return res.json({
+      ok: true,
+      story: storySaved,
+    })
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({
+      ok: false,
+      msg: 'something went wrong',
+    })
+  }
 }
 
 const editStorie = async (req, res = response) => {
@@ -144,11 +162,24 @@ const editStorie = async (req, res = response) => {
       })
     }
 
+    if (!req.file) return
+    const { error, resp } = uploadImageToCloud(
+      req.file.path
+    )
+
+    if (error) {
+      return res.status(400).json({
+        ok: false,
+        msg: resp,
+        error,
+      })
+    }
     const newStory = {
       ...req.body,
+      imageURL: resp.secure_url,
+      publicImg_id: resp.public_id,
       user: uid,
     }
-
     const StoryUpdated = await Story.findByIdAndUpdate(
       storyId,
       newStory,
@@ -189,7 +220,7 @@ const deleteStorie = async (req, res = response) => {
         msg: 'You do not have the privilege to edit this story',
       })
     }
-
+    await deleteImageCloud(story.publicImg_id)
     await Story.findByIdAndDelete(storyId)
 
     res.json({

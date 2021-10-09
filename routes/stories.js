@@ -16,7 +16,7 @@ router.get('/', constroller.getStoriesPagination)
 router.get('/:storyId', constroller.findOneStory)
 
 router.use(validarJWT)
-
+router.use(upload.single('image'))
 router.post(
   '/new',
   [
@@ -36,7 +36,6 @@ router.post(
     check('date', 'Fecha  es obligatoria').custom(isDate),
 
     validarCampos,
-    upload.single('image'),
   ],
   constroller.newStorie
 )
