@@ -23,6 +23,7 @@ app.use(cors())
 
 // Lectura y parseo del body
 app.use(express.json())
+app.use(express.urlencoded({ extended: false }))
 
 //socket.io
 //socket.connect(server);

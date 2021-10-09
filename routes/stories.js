@@ -9,6 +9,7 @@ const constroller = require('../controllers/stories')
 const validarCampos = require('../helpers/validar-campos')
 const validarJWT = require('../middleware/tovenValid')
 const { isDate } = require('../helpers/isDate')
+const upload = require('../middleware/storage')
 const router = Router()
 
 router.get('/', constroller.getStoriesPagination)
@@ -33,7 +34,9 @@ router.post(
       .notEmpty()
       .isLength({ min: 50, max: 2000 }),
     check('date', 'Fecha  es obligatoria').custom(isDate),
+
     validarCampos,
+    upload.single('image'),
   ],
   constroller.newStorie
 )

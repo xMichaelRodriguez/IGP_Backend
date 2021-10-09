@@ -104,22 +104,24 @@ const findOneStory = async (req, res) => {
 }
 
 const newStorie = async (req, res = response) => {
-  const story = new Story(req.body)
-  try {
-    story.user = req.uid
-    const storySaved = await story.save()
+  console.log(req.body)
+  console.log(req.file)
+  // const story = new Story(req.body)
+  // try {
+  //   story.user = req.uid
+  //   const storySaved = await story.save()
 
-    return res.json({
-      ok: true,
-      story: storySaved,
-    })
-  } catch (error) {
-    console.log(error)
-    res.status(500).json({
-      ok: false,
-      msg: 'something went wrong',
-    })
-  }
+  //   return res.json({
+  //     ok: true,
+  //     story: storySaved,
+  //   })
+  // } catch (error) {
+  //   console.log(error)
+  //   res.status(500).json({
+  //     ok: false,
+  //     msg: 'something went wrong',
+  //   })
+  // }
 }
 
 const editStorie = async (req, res = response) => {
