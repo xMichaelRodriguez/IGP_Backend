@@ -163,7 +163,7 @@ const editStorie = async (req, res = response) => {
       })
     }
 
-    if (req.file && !req.body.imageUrl.includes('https')) {
+    if (req.file && !req.body.imageUrl) {
       console.log('sin https')
       const { error, resp } = await updatedCloud(
         req.file.path,
@@ -220,6 +220,7 @@ const editStorie = async (req, res = response) => {
       })
     } else {
       console.log('sin https ni file')
+      console.log(req.body)
       return res.status(400).json({
         ok: false,
         msg: 'File not found',
