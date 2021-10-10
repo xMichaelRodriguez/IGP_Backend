@@ -6,6 +6,7 @@ const moment = require('moment')
 const {
   deleteImageCloud,
   uploadImageToCloud,
+  updatedCloud,
 } = require('../helpers/uploadImages')
 
 const getStoriesPagination = async (req, res) => {
@@ -162,36 +163,68 @@ const editStorie = async (req, res = response) => {
       })
     }
 
-    if (!req.file) return
-    const { error, resp } = uploadImageToCloud(
-      req.file.path
-    )
+    if (req.file && !req.body.imageUrl.includes('https')) {
+      console.log('sin https')
+      const { error, resp } = await updatedCloud(
+        req.file.path,
+        req.body.publicImg_id
+      )
 
-    if (error) {
+      if (error) {
+        return res.status(400).json({
+          ok: false,
+          msg: resp,
+          error,
+        })
+      }
+
+      const newStory = {
+        ...req.body,
+        imageUrl: resp.secure_url,
+        publicImg_id: resp.public_id,
+        user: uid,
+      }
+
+      const StoryUpdated = await Story.findByIdAndUpdate(
+        storyId,
+        newStory,
+        {
+          new: true,
+        }
+      )
+
+      await fs.unlink(req.file.path)
+      res.json({
+        ok: true,
+        story: StoryUpdated,
+      })
+    } else if (
+      !req.file &&
+      req.body.imageUrl.includes('https')
+    ) {
+      console.log('con https')
+      const newStory = {
+        ...req.body,
+        user: uid,
+      }
+      const StoryUpdated = await Story.findByIdAndUpdate(
+        storyId,
+        newStory,
+        {
+          new: true,
+        }
+      )
+      return res.json({
+        ok: true,
+        story: StoryUpdated,
+      })
+    } else {
+      console.log('sin https ni file')
       return res.status(400).json({
         ok: false,
-        msg: resp,
-        error,
+        msg: 'File not found',
       })
     }
-    const newStory = {
-      ...req.body,
-      imageURL: resp.secure_url,
-      publicImg_id: resp.public_id,
-      user: uid,
-    }
-    const StoryUpdated = await Story.findByIdAndUpdate(
-      storyId,
-      newStory,
-      {
-        new: true,
-      }
-    )
-
-    res.json({
-      ok: true,
-      story: StoryUpdated,
-    })
   } catch (error) {
     console.log(error)
     res.status(500).json({

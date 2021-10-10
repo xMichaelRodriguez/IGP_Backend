@@ -11,6 +11,7 @@ const uploadImageToCloud = async (path) => {
   if (!resp) {
     return { error: true, resp }
   }
+
   return { error: false, resp }
 }
 const deleteImageCloud = async (publicId) => {
@@ -24,7 +25,17 @@ const deleteImageCloud = async (publicId) => {
   }
   return { error: false, resp }
 }
+const updatedCloud = async (path, publicId) => {
+  const resp = await cloudDinary.v2.uploader.upload(path)
+  if (!resp) {
+    return { error: true, resp }
+  }
+
+  await deleteImageCloud(publicId)
+  return { error: false, resp }
+}
 module.exports = {
   uploadImageToCloud,
   deleteImageCloud,
+  updatedCloud,
 }
