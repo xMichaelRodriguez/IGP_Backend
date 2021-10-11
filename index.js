@@ -5,6 +5,10 @@ const server = require('http').createServer(app)
 
 const dotenv = require('dotenv').config()
 const cors = require('cors')
+const corsOptions = {
+  origin: 'https://uvs.netlify.app',
+  optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+}
 
 //Rutas
 const authRouter = require('./routes/auth.js')
