@@ -111,7 +111,8 @@ const findOneStory = async (req, res) => {
 }
 
 const newStorie = async (req, res = response) => {
-  const path = ''
+  let path = ''
+  console.log(req.file)
   if (req.file) {
     path = req.file.path
   }
