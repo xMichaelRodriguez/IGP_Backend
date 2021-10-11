@@ -7,32 +7,44 @@ cloudDinary.config({
 })
 
 const uploadImageToCloud = async (path) => {
-  const resp = await cloudDinary.v2.uploader.upload(path)
-  if (!resp) {
-    return { error: true, resp }
-  }
+  try {
+    const resp = await cloudDinary.v2.uploader.upload(path)
+    if (!resp) {
+      return { error: true, resp }
+    }
 
-  return { error: false, resp }
+    return { error: false, resp }
+  } catch (err) {
+    throw Error(err)
+  }
 }
 const deleteImageCloud = async (publicId) => {
-  const resp = await cloudDinary.v2.api.delete_resources(
-    publicId,
-    (Option = {})
-  )
+  try {
+    const resp = await cloudDinary.v2.api.delete_resources(
+      publicId,
+      (Option = {})
+    )
 
-  if (!resp) {
-    return { error: true, resp }
+    if (!resp) {
+      return { error: true, resp }
+    }
+    return { error: false, resp }
+  } catch (error) {
+    throw Error(error)
   }
-  return { error: false, resp }
 }
 const updatedCloud = async (path, publicId) => {
-  const resp = await cloudDinary.v2.uploader.upload(path)
-  if (!resp) {
-    return { error: true, resp }
-  }
+  try {
+    const resp = await cloudDinary.v2.uploader.upload(path)
+    if (!resp) {
+      return { error: true, resp }
+    }
 
-  await deleteImageCloud(publicId)
-  return { error: false, resp }
+    await deleteImageCloud(publicId)
+    return { error: false, resp }
+  } catch (error) {
+    throw Error(error)
+  }
 }
 module.exports = {
   uploadImageToCloud,
