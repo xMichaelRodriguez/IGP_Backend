@@ -2,12 +2,16 @@ const express = require('express')
 // Crear el servidor de express
 const app = express()
 const server = require('http').createServer(app)
-
+const morgan = require('morgan')
 const dotenv = require('dotenv').config()
 const cors = require('cors')
+const whiteList = [
+  'https://uvs.netlify.app',
+  'http://localhost:3000',
+  'http://localhost:4000',
+]
 const corsOptions = {
-  origin: 'https://uvs.netlify.app',
-  optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+  origin: whiteList,
 }
 
 //Rutas
@@ -23,7 +27,8 @@ const socket = require('./socket.js')
 dbConnection()
 
 // CORS
-app.use(cors())
+app.use(cors(corsOptions))
+app.use(morgan('dev'))
 
 // Lectura y parseo del body
 app.use(express.json())
