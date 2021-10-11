@@ -111,7 +111,10 @@ const findOneStory = async (req, res) => {
 }
 
 const newStorie = async (req, res = response) => {
-  const { path } = req.file
+  const path = ''
+  if (req.file) {
+    path = req.file.path
+  }
   try {
     const { error, resp } = await uploadImageToCloud(path)
     if (error) {

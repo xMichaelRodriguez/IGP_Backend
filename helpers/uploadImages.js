@@ -8,6 +8,8 @@ cloudDinary.config({
 
 const uploadImageToCloud = async (path) => {
   try {
+    if (path === '')
+      return { error: true, resp: 'no hay imagen' }
     const resp = await cloudDinary.v2.uploader.upload(path)
     if (!resp) {
       return { error: true, resp }
