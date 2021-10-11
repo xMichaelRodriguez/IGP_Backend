@@ -1,5 +1,5 @@
-const { Schema, model } = require('mongoose')
-const mongoosePagination = require('mongoose-paginate-v2')
+const { Schema, model } = require('mongoose');
+const mongoosePagination = require('mongoose-paginate-v2');
 const storiesSchema = new Schema({
   title: {
     type: String,
@@ -13,6 +13,7 @@ const storiesSchema = new Schema({
   date: {
     type: String,
     require: true,
+    default: new Date(),
   },
   imageUrl: {
     type: String,
@@ -27,15 +28,15 @@ const storiesSchema = new Schema({
     ref: 'User',
     required: true,
   },
-})
+});
 
 storiesSchema.method('toJSON', function () {
-  const { __v, _id, ...object } = this.toObject()
-  object.id = _id
-  return object
-})
+  const { __v, _id, ...object } = this.toObject();
+  object.id = _id;
+  return object;
+});
 
 // load Pagination
-storiesSchema.plugin(mongoosePagination)
+storiesSchema.plugin(mongoosePagination);
 
-module.exports = model('Story', storiesSchema)
+module.exports = model('Story', storiesSchema);
