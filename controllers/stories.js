@@ -187,6 +187,7 @@ const editStorie = async (req, res = response) => {
         imageUrl: resp.secure_url,
         publicImg_id: resp.public_id,
         user: uid,
+        date: new Date(),
       };
 
       const StoryUpdated = await Story.findByIdAndUpdate(
@@ -209,6 +210,7 @@ const editStorie = async (req, res = response) => {
       console.log('con https');
       const newStory = {
         ...req.body,
+        date: new Date(),
         user: uid,
       };
       const StoryUpdated = await Story.findByIdAndUpdate(
