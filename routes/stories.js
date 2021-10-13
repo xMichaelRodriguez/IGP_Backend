@@ -3,20 +3,20 @@
         host * api/stories
 
 */
-const { Router } = require('express')
-const { check } = require('express-validator')
-const constroller = require('../controllers/stories')
-const validarCampos = require('../helpers/validar-campos')
-const validarJWT = require('../middleware/tovenValid')
-const { isDate } = require('../helpers/isDate')
-const upload = require('../middleware/storage')
-const router = Router()
+const { Router } = require('express');
+const { check } = require('express-validator');
+const constroller = require('../controllers/stories');
+const validarCampos = require('../helpers/validar-campos');
+const validarJWT = require('../middleware/tovenValid');
+const { isDate } = require('../helpers/isDate');
+const upload = require('../middleware/storage');
+const router = Router();
 
-router.get('/', constroller.getStoriesPagination)
-router.get('/:storyId', constroller.findOneStory)
+router.get('/', constroller.getStoriesPagination);
+router.get('/:storyId', constroller.findOneStory);
 
-router.use(validarJWT)
-router.use(upload.single('image'))
+router.use(validarJWT);
+router.use(upload.single('image'));
 router.post(
   '/new',
   [
@@ -26,7 +26,7 @@ router.post(
       'Título obligatorio y mínimo de 6 caracteres'
     )
       .notEmpty()
-      .isLength({ min: 6 }),
+      .isLength({ min: 20 }),
     check(
       'body',
       'Cuerpo obligatorio y mínimo de 50 caracteres y máximo de 2000 caracteres '
@@ -38,7 +38,7 @@ router.post(
     validarCampos,
   ],
   constroller.newStorie
-)
+);
 router.put(
   '/:id', //middleware
   [
@@ -61,6 +61,6 @@ router.put(
     validarCampos,
   ],
   constroller.editStorie
-)
-router.delete('/:id', constroller.deleteStorie)
-module.exports = router
+);
+router.delete('/:id', constroller.deleteStorie);
+module.exports = router;

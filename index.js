@@ -19,6 +19,7 @@ const authRouter = require('./routes/auth.js');
 const storiesRouter = require('./routes/stories');
 const noticeRouter = require('./routes/notice');
 const organizationRoute = require('./routes/organization');
+const commicsRoute = require('./routes/commics');
 //database
 const { dbConnection } = require('./database/config.js');
 const socket = require('./socket.js');
@@ -42,6 +43,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/stories', storiesRouter);
 app.use('/api/noticies', noticeRouter);
 app.use('/api/organizations', organizationRoute);
+app.use('/api/commics', commicsRoute);
 
 // Escuchar peticiones
 server.listen(process.env.PORT, () => {
