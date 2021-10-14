@@ -12,7 +12,54 @@ const getCommics = async (
   res = response
 ) => {
   try {
-    const commicsFound = await Commics.find();
+    let { page, startDate, endDate } = req.query;
+
+    //Recoger Pagina actual
+    if (
+      !page ||
+      page === '0' ||
+      page === null ||
+      page === undefined
+    ) {
+      page = 1;
+    } else {
+      page = parseInt(page);
+    }
+
+    //indicar las opciones de paginacion
+    const options = {
+      sort: { date: -1 },
+      limit: 10,
+      page,
+    };
+    //find Paginado
+
+    let commicsFound = null;
+    if (
+      (!startDate && !endDate) ||
+      (startDate === '0' && endDate === '0') ||
+      (startDate === null && endDate === null) ||
+      (startDate === undefined && endDate === undefined)
+    ) {
+      const query = {};
+
+      commicsFound = await Commics.paginate(query, options);
+    } else {
+      const start = moment(startDate)
+        .toISOString()
+        .toString();
+
+      const end = moment(endDate).toISOString().toString();
+
+      const query = {
+        date: {
+          $gte: start,
+          $lte: end,
+        },
+      };
+      commicsFound = await Commics.paginate(query, options);
+    }
+
     if (!commicsFound)
       return res.status(200).json({
         ok: true,
