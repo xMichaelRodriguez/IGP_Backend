@@ -66,10 +66,21 @@ const getCommics = async (
         msg: 'No hay commics',
       });
 
-    return res.status(200).json({
-      ok: true,
-      commics: commicsFound,
-    });
+    if (commicsFound.docs.length < 6) {
+      return res.status(200).json({
+        ok: true,
+        commicsFound: commicsFound.docs,
+        total_docs: commicsFound.totalDocs,
+        total_page: 1,
+      });
+    } else {
+      return res.json({
+        ok: true,
+        commicsFound: commicsFound.docs,
+        total_docs: commicsFound.totalDocs,
+        total_page: commicsFound.totalPages,
+      });
+    }
   } catch (error) {
     console.log(error);
     return res.status(500).json({
