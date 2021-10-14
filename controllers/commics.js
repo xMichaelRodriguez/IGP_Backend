@@ -167,6 +167,7 @@ const deleteCommic = async (
   req = request,
   res = response
 ) => {
+  const uid = req.uid
   try {
     const commic = await Commics.findById(
       req.params.commicId
@@ -175,6 +176,13 @@ const deleteCommic = async (
       return res.status(404).json({
         ok: false,
         msg: 'Commic no encontrado',
+      })
+    }
+
+    if (commic.user.toString() !== uid) {
+      return res.status(401).json({
+        ok: false,
+        msg: 'You do not have the privilege to edit this Commic',
       })
     }
 
