@@ -1,18 +1,18 @@
-const { response, request } = require('express');
+const { response, request } = require('express')
 
 const {
   uploadMultiImages,
   deleteGalleryImages,
   deleteImageCloud,
-} = require('../helpers/uploadImages');
-const Commics = require('../models/Commics');
+} = require('../helpers/uploadImages')
+const Commics = require('../models/Commics')
 
 const getCommics = async (
   req = request,
   res = response
 ) => {
   try {
-    let { page, startDate, endDate } = req.query;
+    let { page, startDate, endDate } = req.query
 
     //Recoger Pagina actual
     if (
@@ -21,9 +21,9 @@ const getCommics = async (
       page === null ||
       page === undefined
     ) {
-      page = 1;
+      page = 1
     } else {
-      page = parseInt(page);
+      page = parseInt(page)
     }
 
     //indicar las opciones de paginacion
@@ -31,40 +31,40 @@ const getCommics = async (
       sort: { date: -1 },
       limit: 10,
       page,
-    };
+    }
     //find Paginado
 
-    let commicsFound = null;
+    let commicsFound = null
     if (
       (!startDate && !endDate) ||
       (startDate === '0' && endDate === '0') ||
       (startDate === null && endDate === null) ||
       (startDate === undefined && endDate === undefined)
     ) {
-      const query = {};
+      const query = {}
 
-      commicsFound = await Commics.paginate(query, options);
+      commicsFound = await Commics.paginate(query, options)
     } else {
       const start = moment(startDate)
         .toISOString()
-        .toString();
+        .toString()
 
-      const end = moment(endDate).toISOString().toString();
+      const end = moment(endDate).toISOString().toString()
 
       const query = {
         date: {
           $gte: start,
           $lte: end,
         },
-      };
-      commicsFound = await Commics.paginate(query, options);
+      }
+      commicsFound = await Commics.paginate(query, options)
     }
 
     if (!commicsFound)
       return res.status(200).json({
         ok: true,
         msg: 'No hay commics',
-      });
+      })
 
     if (commicsFound.docs.length < 6) {
       return res.status(200).json({
@@ -72,25 +72,27 @@ const getCommics = async (
         commics: commicsFound.docs,
         total_docs: commicsFound.totalDocs,
         total_page: 1,
-        prevPage=commicsFound.prevPage,
-        nextPage=commicsFound.nextPage,
-      });
+        prevPage: commicsFound.prevPage,
+        nextPage: commicsFound.nextPage,
+      })
     } else {
       return res.json({
         ok: true,
         commicsFound: commicsFound.docs,
         total_docs: commicsFound.totalDocs,
         total_page: commicsFound.totalPages,
-      });
+        prevPage: commicsFound.prevPage,
+        nextPage: commicsFound.nextPage,
+      })
     }
   } catch (error) {
-    console.log(error);
+    console.log(error)
     return res.status(500).json({
       ok: false,
       msg: 'something wen wrong',
-    });
+    })
   }
-};
+}
 const getCommicById = async (
   req = request,
   res = response
@@ -98,68 +100,68 @@ const getCommicById = async (
   try {
     const commicsFound = await Commics.findById(
       req.params.commicId
-    );
+    )
     if (!commicsFound)
       return res.status(404).json({
         ok: false,
         msg: 'Commic no existe',
-      });
+      })
 
     return res.status(200).json({
       ok: true,
       commics: commicsFound,
-    });
+    })
   } catch (error) {
-    console.log(error);
+    console.log(error)
     return res.status(500).json({
       ok: false,
       msg: 'something wen wrong',
-    });
+    })
   }
-};
+}
 
 const newCommic = async (req = request, res = response) => {
   try {
     const path = {
       coverPage: req.files?.coverPage,
       gallery: req.files?.gallery,
-    };
+    }
 
     const { error, commicResult } = await uploadMultiImages(
       path
-    );
+    )
 
     if (error !== false) {
       return res.status(400).json({
         ok: false,
         msg: error,
         commicResult,
-      });
+      })
     }
 
-    const { coverPage, gallery } = commicResult;
+    const { coverPage, gallery } = commicResult
 
     const commicToSave = new Commics({
       ...req.body,
       coverPage,
       gallery,
-    });
-    commicToSave.user = req.uid;
-    const commicSaved = await commicToSave.save();
+    })
+    commicToSave.user = req.uid
+    const commicSaved = await commicToSave.save()
     return res.status(200).json({
       ok: true,
       msg: 'Commic Guardado',
       commics: commicSaved,
-    });
+    })
   } catch (error) {
-    console.log(error);
+    console.log(error)
     return res.status(500).json({
       ok: false,
       msg: 'Something wen wrong',
       error,
-    });
+    })
   }
-};
+}
 
 const deleteCommic = async (
   req = request,
@@ -168,21 +170,21 @@ const deleteCommic = async (
   try {
     const commic = await Commics.findById(
       req.params.commicId
-    );
+    )
     if (!commic) {
       return res.status(404).json({
         ok: false,
         msg: 'Commic no encontrado',
-      });
+      })
     }
 
     const galleryDeleted = await deleteGalleryImages(
       commic.gallery
-    );
+    )
 
     const coverPageDeleted = await deleteImageCloud(
       commic.coverPage?.publicId
-    );
+    )
 
     if (!galleryDeleted || coverPageDeleted.error) {
       return res.status(400).json({
@@ -190,23 +192,23 @@ const deleteCommic = async (
         msg: 'Algo salio mal al intentar eliminar el commic',
         galleryDeleted,
         coverPageDeleted,
-      });
+      })
     }
-    await Commics.findByIdAndDelete(req.params.commicId);
+    await Commics.findByIdAndDelete(req.params.commicId)
 
     return res.status(200).json({
       ok: true,
       msg: 'Commic Eliminado',
-    });
+    })
   } catch (error) {
-    console.log(error);
+    console.log(error)
     return res.status(500).json({
       ok: false,
       error,
       msg: 'Something wen wrong',
-    });
+    })
   }
-};
+}
 
 module.exports = {
   getCommics,
@@ -214,4 +216,4 @@ module.exports = {
   newCommic,
 
   deleteCommic,
-};
+}
