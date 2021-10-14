@@ -69,7 +69,7 @@ const getCommics = async (
     if (commicsFound.docs.length < 6) {
       return res.status(200).json({
         ok: true,
-        commicsFound: commicsFound.docs,
+        commics: commicsFound.docs,
         total_docs: commicsFound.totalDocs,
         total_page: 1,
       });
