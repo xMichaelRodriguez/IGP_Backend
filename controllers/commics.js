@@ -72,6 +72,8 @@ const getCommics = async (
         commics: commicsFound.docs,
         total_docs: commicsFound.totalDocs,
         total_page: 1,
+        prevPage=commicsFound.prevPage,
+        nextPage=commicsFound.nextPage,
       });
     } else {
       return res.json({
@@ -99,7 +101,7 @@ const getCommicById = async (
     );
     if (!commicsFound)
       return res.status(404).json({
-        ok: true,
+        ok: false,
         msg: 'Commic no existe',
       });
 
