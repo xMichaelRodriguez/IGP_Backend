@@ -20,7 +20,7 @@ const getNoticies = async (req, res = response) => {
     //indicar las opciones de paginacion
     const options = {
       sort: { date: -1 },
-      limit: 6,
+      limit: 8,
       page,
     };
     //find Paginado
@@ -56,22 +56,16 @@ const getNoticies = async (req, res = response) => {
         .status(404)
         .json({ ok: false, msg: 'No hay noticias' });
     }
+    return res.status(200).json({
+      ok: true,
 
-    if (noticies.docs.length < 6) {
-      return res.status(200).json({
-        ok: true,
-        noticies: noticies.docs,
-        total_docs: noticies.totalDocs,
-        total_page: 1,
-      });
-    } else {
-      return res.json({
-        ok: true,
-        noticies: noticies.docs,
-        total_docs: noticies.totalDocs,
-        total_page: noticies.totalPages,
-      });
-    }
+      noticies: noticies.docs,
+      totalDocs: noticies.totalDocs,
+      totalPage: noticies.totalPages,
+      prevPage: noticies.prevPage,
+      nextPage: noticies.nextPage,
+    });
+
   } catch (error) {
     return res.status(500).json({
       ok: false,

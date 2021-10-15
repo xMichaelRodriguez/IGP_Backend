@@ -66,21 +66,17 @@ const getStoriesPagination = async (req, res) => {
         .json({ ok: false, msg: 'No hay historias' });
     }
 
-    if (stories.docs.length < 6) {
+   
       return res.status(200).json({
         ok: true,
         stories: stories.docs,
-        total_docs: stories.totalDocs,
-        total_page: 1,
+        totalDocs: stories.totalDocs,
+        totalPages: stories.totalPages,
+        prevPage:stories.prevPage,
+        nextPage:stories.nextPage
+
       });
-    } else {
-      return res.status(200).json({
-        ok: true,
-        stories: stories.docs,
-        total_docs: stories.totalDocs,
-        total_page: stories.totalPages,
-      });
-    }
+    
   } catch (err) {
     console.log(err);
     return res.status(200).json({ ok: false, err });
