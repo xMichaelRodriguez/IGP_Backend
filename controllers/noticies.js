@@ -78,6 +78,12 @@ const findById = async (req, res = response) => {
     const noticies = await Notice.findById(
       req.params.noticeId
     );
+    if (!noticies) {
+      return res.status(404).json({
+        ok: false,
+        msg: 'Noticia no encontrada con este id'
+      })
+    }
     res.json({
       ok: true,
       noticies,
