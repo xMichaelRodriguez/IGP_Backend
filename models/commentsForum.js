@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const commentForum = new Schema({
-    message: {
+    comment: {
         type: String,
         require: true,
 
@@ -10,6 +10,11 @@ const commentForum = new Schema({
     forumId: {
         type: Schema.Types.ObjectId,
         ref: 'Forum',
+        required: true,
+    },
+    user: {
+        type: Schema.Types.ObjectId,
+        ref: 'ForumUser',
         required: true,
     },
 

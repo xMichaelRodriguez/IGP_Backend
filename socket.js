@@ -1,4 +1,6 @@
+const CommentsForum = require('./models/commentsForum')
 const ForumUser = require('./models/forum')
+const forums = require('./models/forums')
 const Forums = require('./models/forums')
 
 module.exports.listen = function (io, socket) {
@@ -69,9 +71,51 @@ module.exports.listen = function (io, socket) {
     }
   })
 
+  socket.on('loading-active-foro', async () => {
+    try {
+      //llamar todos los foros
+      const forums = await Forums.find()
+
+      if (!forums) return
+
+      const comments = []
+      forums.forEach(element => {
+        comments.push(element._id)
+      });
+
+      //llamar todos los commentarios de cada foro
+      let commentToCompare = []
+      for (const uid of comments) {
+        const resp = await CommentsForum.find({ forumId: uid })
+        commentToCompare.push(resp)
+      }
+
+
+      const mayor = []
+      for (let i = 0; i < commentToCompare.length; i++) {
+        const item = commentToCompare[i];
+        for (let j = 0; j < commentToCompare.length; j++) {
+          const element = commentToCompare[j];
+          if (item.length > element.length) {
+            mayor.push(...item)
+          }
+
+        }
+      }
+
+      const resp = await Forums.findById(mayor[0].forumId)
+      socket.emit('loaded-active-forums', resp);
+
+    } catch (error) {
+      console.log(error)
+      // return cb({ msg: `error interno ${error}`, forums: null })
+    }
+  })
+
   socket.on('findById', async (data, cb) => {
     try {
-      const forum = await Forums.findById(data.foroId);
+      const forum = await Forums.findById(data.foroId)
+
       if (!forum) {
         cb({ msg: "No existe foro con ese id", forum: null })
       }
@@ -79,8 +123,53 @@ module.exports.listen = function (io, socket) {
       cb({ msg: "", forum })
     } catch (error) {
       console.log(error)
-      cb({ msg: "Error de servidor" })
+      cb({ msg: "Error de servidor", forum: null })
+    }
+  });
+
+  socket.on('comment-in-forum', async (data, cb) => {
+    try {
+      const { commentBox, userId, forumId } = data;
+
+      if (!commentBox) {
+        cb({ msg: "falta parametro comentario", comment: null })
+      }
+      if (!userId) {
+        cb({ msg: "falta parametro usuario", comment: null })
+      }
+      if (!forumId) {
+        cb({ msg: "falta parametro foro", comment: null })
+      }
+
+      const commentToSave = new CommentsForum({ comment: commentBox, forumId, user: userId });
+      await commentToSave.save();
+
+
+      const commentsOfForum = await CommentsForum.findOne({ forumId, _id: commentToSave._id }).populate('user')
+      cb({ msg: "", comment: commentsOfForum })
+
+
+    } catch (error) {
+      console.log(error)
+      cb({ msg: "Error de servidor", comment: null })
     }
   })
 
+  socket.on('load-comments', async (data) => {
+    try {
+
+      const commentsOfForum = await CommentsForum.find({ forumId: data }).populate('user')
+
+      socket.emit('comments-loaded', commentsOfForum)
+
+    } catch (error) {
+      console.log(error)
+    }
+
+
+
+  })
+
+
 }
+
