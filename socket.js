@@ -1,6 +1,5 @@
 const CommentsForum = require('./models/commentsForum')
 const ForumUser = require('./models/forum')
-const forums = require('./models/forums')
 const Forums = require('./models/forums')
 
 module.exports.listen = function (io, socket) {
@@ -80,6 +79,7 @@ module.exports.listen = function (io, socket) {
         socket.emit('loaded-active-forums', []);
       }
 
+      // sacar comentarios de cada foro
       const comments = []
       forums.forEach(element => {
         comments.push(element._id)
@@ -89,24 +89,39 @@ module.exports.listen = function (io, socket) {
       let commentToCompare = []
       for (const uid of comments) {
         const resp = await CommentsForum.find({ forumId: uid })
-        commentToCompare.push(resp)
-      }
-
-
-      const mayor = []
-      for (let i = 0; i < commentToCompare.length; i++) {
-        const item = commentToCompare[i];
-        for (let j = 0; j < commentToCompare.length; j++) {
-          const element = commentToCompare[j];
-          if (item.length > element.length) {
-            mayor.push(...item)
-          }
+        if (resp) {
+          commentToCompare.push([{ foro: resp, totalComments: resp.length }])
 
         }
+
       }
 
-      const resp = await Forums.findById(mayor[0].forumId)
-      socket.emit('loaded-active-forums', resp);
+      // sacamos el total de comentarios de cada foro
+      let resp = []
+      commentToCompare.forEach((currentValue) => {
+
+        resp.push(currentValue[0].totalComments)
+
+      });
+      //ordenamos y retornamos el numero mayor de los totales de comentarios de cada foro
+      const maxComments = resp.sort(comparar).pop()
+
+
+      //comparamos cada foro y verificamos si el maxComments que sacamos coincide
+      //  con un foro para luego retornar este
+      let forumActive = []
+      commentToCompare.forEach(async (element) => {
+        if (element[0].totalComments === maxComments) {
+          forumActive.push(...element[0].foro)
+        }
+
+      });
+
+      const forumToFind = forumActive.pop()
+
+      const forumUltimateActive = await Forums.findById(forumToFind.forumId);
+
+      socket.emit('loaded-active-forums', forumUltimateActive);
 
     } catch (error) {
       console.log(error)
@@ -196,3 +211,7 @@ module.exports.listen = function (io, socket) {
 
 }
 
+const comparar = (a, b) => {
+
+  return a - b
+}
