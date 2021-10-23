@@ -22,7 +22,6 @@ const storiesRouter = require('./routes/stories');
 const noticeRouter = require('./routes/notice');
 const organizationRoute = require('./routes/organization');
 const commicsRoute = require('./routes/commics');
-const forumsRoute = require('./routes/forums');
 //database
 const { dbConnection } = require('./database/config.js');
 const socket = require('./socket.js');
@@ -52,7 +51,7 @@ app.use('/api/stories', storiesRouter);
 app.use('/api/noticies', noticeRouter);
 app.use('/api/organizations', organizationRoute);
 app.use('/api/commics', commicsRoute);
-app.use('/api/forums', forumsRoute);
+
 
 // sockets
 io.on('connection', socket => {

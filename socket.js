@@ -76,7 +76,9 @@ module.exports.listen = function (io, socket) {
       //llamar todos los foros
       const forums = await Forums.find()
 
-      if (!forums) return
+      if (!forums) {
+        socket.emit('loaded-active-forums', []);
+      }
 
       const comments = []
       forums.forEach(element => {
@@ -167,6 +169,27 @@ module.exports.listen = function (io, socket) {
     }
 
 
+
+  })
+
+
+  socket.on('load-my-forums', async (data) => {
+    const myForums = await Forums.find({ user: data })
+    if (!myForums) {
+      socket.emit('loaded-my-forums', { msg: "no tienes foros", forums: null })
+    }
+
+    socket.emit('loaded-my-forums', { msg: "", forums: myForums })
+  })
+
+  socket.on('delete-my-forum', async (data, cb) => {
+    try {
+      await Forums.findByIdAndDelete(data.forumId)
+
+      cb({ msg: "Foro Eliminado" })
+    } catch (error) {
+      cb({ msg: "Error de servidor" })
+    }
 
   })
 
