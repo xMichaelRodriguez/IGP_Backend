@@ -83,7 +83,8 @@ module.exports.listen = function (io, socket) {
     }
   })
 
-  socket.on('loading-forums', async ({ page }) => {
+  socket.on('loading-forums', async (page) => {
+
     try {
       //Recoger Pagina actual
       if (
