@@ -17,10 +17,10 @@ router.post(
     //middleware
     check(
       'title',
-      'Título obligatorio y mínimo de 6 caracteres'
+      'Título obligatorio y mínimo de 20 caracteres'
     )
       .notEmpty()
-      .isLength({ min: 6 }),
+      .isLength({ min: 20 }),
     check(
       'body',
       'Cuerpo obligatorio y mínimo de 50 caracteres y máximo de 2000 caracteres '

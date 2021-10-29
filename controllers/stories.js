@@ -26,7 +26,7 @@ const getStoriesPagination = async (req, res) => {
 
     //indicar las opciones de paginacion
     const options = {
-      sort: { date: 1 },
+      sort: { date: -1 },
       limit: 6,
       page,
     };

@@ -1,5 +1,4 @@
 const { response } = require('express');
-const moment = require('moment');
 const Notice = require('../models/notice');
 const getNoticies = async (req, res = response) => {
   try {
@@ -65,7 +64,7 @@ const getNoticies = async (req, res = response) => {
 
       noticies: noticies.docs,
       totalDocs: noticies.totalDocs,
-      totalPage: noticies.totalPages,
+      totalPages: noticies.totalPages,
       prevPage: noticies.prevPage,
       nextPage: noticies.nextPage,
     });
@@ -102,7 +101,7 @@ const findById = async (req, res = response) => {
 
 const newNotice = async (req, res = response) => {
   try {
-    const newNotices = new Notice(req.body);
+    const newNotices = new Notice({ ...req.body });
     newNotices.user = req.uid;
     const resp = await newNotices.save();
 
