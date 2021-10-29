@@ -36,18 +36,22 @@ const getNoticies = async (req, res = response) => {
 
       noticies = await Notice.paginate(query, options);
     } else {
-      const start = moment(startDate)
-        .toISOString()
-        .toString();
-
-      const end = moment(endDate).toISOString().toString();
-
-      const query = {
-        date: {
-          $gte: start,
-          $lte: end,
-        },
-      };
+      let query = {};
+      if (startDate === endDate) {
+        query = {
+          date: {
+            $gt: startDate,
+          },
+        }
+      } else {
+        query = {
+          date: {
+            $gt: startDate,
+            $lt: endDate,
+          },
+        }
+      }
+      console.log(query)
       noticies = await Notice.paginate(query, options);
     }
 
@@ -98,9 +102,9 @@ const findById = async (req, res = response) => {
 
 const newNotice = async (req, res = response) => {
   try {
-    const EditedNotice = new Notice(req.body);
-    EditedNotice.user = req.uid;
-    const resp = await EditedNotice.save();
+    const newNotices = new Notice(req.body);
+    newNotices.user = req.uid;
+    const resp = await newNotices.save();
 
     if (resp) {
       return res.status(200).json({
@@ -140,6 +144,7 @@ const editNotice = async (req, res = response) => {
 
     const newNotice = {
       ...req.body,
+      date: new Date(),
       user: uid,
     };
 

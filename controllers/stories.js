@@ -1,7 +1,6 @@
 const Story = require('../models/stories');
 const fs = require('fs-extra');
 const { response } = require('express');
-const moment = require('moment');
 
 const {
   deleteImageCloud,
@@ -27,7 +26,7 @@ const getStoriesPagination = async (req, res) => {
 
     //indicar las opciones de paginacion
     const options = {
-      sort: { date: -1 },
+      sort: { date: 1 },
       limit: 6,
       page,
     };
@@ -44,19 +43,25 @@ const getStoriesPagination = async (req, res) => {
 
       stories = await Story.paginate(query, options);
     } else {
-      const start = moment(startDate)
-        .toISOString()
-        .toString();
+      let query = {};
+      if (startDate === endDate) {
+        query = {
+          date: {
+            $gt: startDate,
+          },
+        }
+      } else {
+        query = {
+          date: {
+            $gt: startDate,
+            $lt: endDate,
+          },
+        }
+      }
 
-      const end = moment(endDate).toISOString().toString();
 
-      const query = {
-        date: {
-          $gte: start,
-          $lte: end,
-        },
-      };
 
+      console.log(query,)
       stories = await Story.paginate(query, options);
     }
 
@@ -66,17 +71,17 @@ const getStoriesPagination = async (req, res) => {
         .json({ ok: false, msg: 'No hay historias' });
     }
 
-   
-      return res.status(200).json({
-        ok: true,
-        stories: stories.docs,
-        totalDocs: stories.totalDocs,
-        totalPages: stories.totalPages,
-        prevPage:stories.prevPage,
-        nextPage:stories.nextPage
 
-      });
-    
+    return res.status(200).json({
+      ok: true,
+      stories: stories.docs,
+      totalDocs: stories.totalDocs,
+      totalPages: stories.totalPages,
+      prevPage: stories.prevPage,
+      nextPage: stories.nextPage
+
+    });
+
   } catch (err) {
     console.log(err);
     return res.status(200).json({ ok: false, err });
@@ -152,14 +157,14 @@ const editStorie = async (req, res = response) => {
     if (!story) {
       return res.status(404).json({
         ok: false,
-        msg: 'This story does not exist with that ID',
+        msg: 'Esta historia no existe con ese ID',
       });
     }
 
     if (story.user.toString() !== uid) {
       return res.status(401).json({
         ok: false,
-        msg: 'You do not have the privilege to edit this story',
+        msg: 'No tienes privilegios para realizar esta accion',
       });
     }
 
@@ -209,6 +214,7 @@ const editStorie = async (req, res = response) => {
         date: new Date(),
         user: uid,
       };
+
       const StoryUpdated = await Story.findByIdAndUpdate(
         storyId,
         newStory,
