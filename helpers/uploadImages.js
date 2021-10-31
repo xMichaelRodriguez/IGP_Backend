@@ -80,7 +80,6 @@ const uploadMultiImages = async (path = {}) => {
   };
   const resGallery = await uploadGalleryImages(gallery);
   commicResult.gallery = [...resGallery];
-
   return { error: false, commicResult };
 };
 
@@ -100,12 +99,13 @@ const uploadGalleryImages = async (arrGallery = []) => {
     const { path } = file;
     const { secure_url, public_id } =
       await cloudDinary.v2.uploader.upload(path);
-    await fs.unlinkSync(path);
+
 
     urls.push({
       imageUrl: secure_url,
       publicID: public_id,
     });
+    await fs.unlinkSync(path);
   }
   return urls;
 };

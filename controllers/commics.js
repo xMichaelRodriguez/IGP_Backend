@@ -1,5 +1,5 @@
 const { response, request } = require('express')
-
+const fs = require('fs-extra')
 const {
   uploadMultiImages,
   deleteGalleryImages,
@@ -113,6 +113,7 @@ const getCommicById = async (
 
 const newCommic = async (req = request, res = response) => {
   try {
+
     const path = {
       coverPage: req.files?.coverPage,
       gallery: req.files?.gallery,

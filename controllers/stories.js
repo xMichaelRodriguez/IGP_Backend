@@ -7,6 +7,7 @@ const {
   uploadImageToCloud,
   updatedCloud,
 } = require('../helpers/uploadImages');
+const moment = require('moment');
 
 const getStoriesPagination = async (req, res) => {
   try {
@@ -33,6 +34,7 @@ const getStoriesPagination = async (req, res) => {
 
     //find Paginado
     let stories = null;
+
     if (
       (!startDate && !endDate) ||
       (startDate === '0' && endDate === '0') ||
@@ -44,25 +46,22 @@ const getStoriesPagination = async (req, res) => {
       stories = await Story.paginate(query, options);
     } else {
       let query = {};
-      if (startDate === endDate) {
-        query = {
-          date: {
-            $gt: startDate,
-          },
-        }
-      } else {
-        query = {
-          date: {
-            $gt: startDate,
-            $lt: endDate,
-          },
-        }
+
+      const startFormat = new Date(startDate).toLocaleDateString('es-ES')
+      const endFormat = new Date(endDate).toLocaleDateString('es-ES')
+
+      query = {}
+      stories = await Story.paginate(query, options);
+      const filtered = stories.docs.filter(story => {
+        const dates = new Date(story.date).toLocaleDateString('es-ES');
+
+        return dates >= startFormat && dates <= endFormat
+      })
+      stories = {
+        docs: [...filtered],
+        todalDocs: stories.totalDocs, totalPages: stories.totalPages, nexPage: stories.nextPage, prevPage: stories.prevPage
       }
 
-
-
-      console.log(query,)
-      stories = await Story.paginate(query, options);
     }
 
     if (!stories) {
@@ -70,7 +69,6 @@ const getStoriesPagination = async (req, res) => {
         .status(404)
         .json({ ok: false, msg: 'No hay historias' });
     }
-
 
     return res.status(200).json({
       ok: true,

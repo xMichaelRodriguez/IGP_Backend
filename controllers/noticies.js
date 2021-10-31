@@ -35,23 +35,20 @@ const getNoticies = async (req, res = response) => {
 
       noticies = await Notice.paginate(query, options);
     } else {
-      let query = {};
-      if (startDate === endDate) {
-        query = {
-          date: {
-            $gt: startDate,
-          },
-        }
-      } else {
-        query = {
-          date: {
-            $gt: startDate,
-            $lt: endDate,
-          },
-        }
-      }
-      console.log(query)
+      const startFormat = new Date(startDate).toLocaleDateString('es-ES')
+      const endFormat = new Date(endDate).toLocaleDateString('es-ES')
+
+      query = {}
       noticies = await Notice.paginate(query, options);
+      const filtered = noticies.docs.filter(notice => {
+        const dates = new Date(notice.date).toLocaleDateString('es-ES');
+
+        return dates >= startFormat && dates <= endFormat
+      })
+      noticies = {
+        docs: [...filtered],
+        todalDocs: noticies.totalDocs, totalPages: noticies.totalPages, nexPage: noticies.nextPage, prevPage: noticies.prevPage
+      }
     }
 
     if (!noticies) {
