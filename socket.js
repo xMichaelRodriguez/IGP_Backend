@@ -277,6 +277,20 @@ module.exports.listen = function (io, socket) {
     } catch (error) {
       cb({ msg: 'Error de servidor' })
     }
+  });
+
+  socket.on('delete-comment', async (id, cb) => {
+    try {
+      const response = await CommentsForum.findByIdAndDelete(id);
+      if (!response) {
+        return cb("No se encontro un foro con ese id");
+      }
+
+      return socket.emit('deletedComment', "Comentario eliminado")
+    } catch (error) {
+      cb(error)
+    }
+
   })
 }
 
