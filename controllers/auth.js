@@ -13,7 +13,7 @@ const login = async (req, res = response) => {
     if (!userSchema) {
       return res.status(400).json({
         ok: false,
-        msg: 'User not found that email',
+        msg: 'no existe usuario con ese correo',
       })
     }
 
