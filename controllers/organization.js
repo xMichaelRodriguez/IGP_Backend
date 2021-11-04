@@ -19,7 +19,7 @@ const getAllOrganizations = async (
   } catch (error) {
     return res.status(500).json({
       ok: false,
-      msg: err,
+      msg: error,
     })
   }
 }
