@@ -47,19 +47,21 @@ const getStoriesPagination = async (req, res) => {
     } else {
       let query = {};
 
-      const startFormat = new Date(startDate).toLocaleDateString('es-ES')
-      const endFormat = new Date(endDate).toLocaleDateString('es-ES')
+      const startFormatDate = new Date(startDate).toISOString()
+      const endFormatDate = new Date(endDate).toISOString()
 
       query = {}
       stories = await Story.paginate(query, options);
       const filtered = stories.docs.filter(story => {
-        const dates = new Date(story.date).toLocaleDateString('es-ES');
+        const dates = new Date(story.date).toISOString().split('T')[0]
+        const startDate = startFormatDate.split('T')[0];
+        const endDate = endFormatDate.split('T')[0]
 
-        return dates >= startFormat && dates <= endFormat
+        return dates >= startDate && dates <= endDate
       })
       stories = {
         docs: [...filtered],
-        todalDocs: stories.totalDocs, totalPages: stories.totalPages, nexPage: stories.nextPage, prevPage: stories.prevPage
+        todalDocs: 0, totalPages: 0, nextPage: null, prevPage: null
       }
 
     }
@@ -76,7 +78,7 @@ const getStoriesPagination = async (req, res) => {
       totalDocs: stories.totalDocs,
       totalPages: stories.totalPages,
       prevPage: stories.prevPage,
-      nextPage: stories.nextPage
+      nextPage: stories.nextPage,
 
     });
 

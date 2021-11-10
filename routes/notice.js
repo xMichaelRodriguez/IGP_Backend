@@ -27,7 +27,7 @@ router.post(
     )
       .notEmpty()
       .isLength({ min: 50, max: 2000 }),
-    check('date', 'Fecha es obligatoria').custom(isDate),
+   
     validarCampos,
   ],
   constroller.newNotice
@@ -48,9 +48,7 @@ router.put(
     )
       .notEmpty()
       .isLength({ min: 50, max: 2000 }),
-    check('date', 'Fecha de inicio es obligatoria').custom(
-      isDate
-    ),
+    
     validarCampos,
   ],
   constroller.editNotice
