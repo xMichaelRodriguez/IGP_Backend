@@ -3,50 +3,64 @@
         host * api/stories
 
 */
-const { Router } = require("express");
-const { check } = require("express-validator");
-const constroller = require("../controllers/stories");
-const validarCampos = require("../helpers/validar-campos");
-const validarJWT = require("../middleware/tovenValid");
+const { Router } = require('express');
+const { check } = require('express-validator');
+const constroller = require('../controllers/stories');
+const validarCampos = require('../helpers/validar-campos');
+const validarJWT = require('../middleware/tovenValid');
+const { isDate } = require('../helpers/isDate');
+const upload = require('../middleware/storage');
 const router = Router();
 
-
+router.get('/', constroller.getStoriesPagination);
+router.get('/:storyId', constroller.findOneStory);
 
 router.use(validarJWT);
-
-router.get("/", constroller.getStories);
+router.use(upload.single('image'));
 router.post(
-  "/new",
+  '/new',
   [
     //middleware
-    check("title", "Mandatory title and minimum of 6 characters")
-      .notEmpty()
-      .isLength({ min: 6 }),
     check(
-      "body",
-      "Mandatory body and minimum of 50 characters and maximum of 2000 characters "
+      'title',
+      'Título obligatorio y mínimo de 6 caracteres'
+    )
+      .notEmpty()
+      .isLength({ min: 20 }),
+    check(
+      'body',
+      'Cuerpo obligatorio y mínimo de 50 caracteres y máximo de 2000 caracteres '
     )
       .notEmpty()
       .isLength({ min: 50, max: 2000 }),
+    check('date', 'Fecha  es obligatoria').custom(isDate),
+
     validarCampos,
   ],
   constroller.newStorie
 );
 router.put(
-  "/:id", //middleware
+  '/:id', //middleware
   [
-    check("title", "Mandatory title and minimum of 6 characters")
+    //middleware
+    check(
+      'title',
+      'Título obligatorio y mínimo de 6 caracteres'
+    )
       .notEmpty()
       .isLength({ min: 6 }),
     check(
-      "body",
-      "Mandatory body and minimum of 50 characters and maximum of 2000 characters "
+      'body',
+      'Cuerpo obligatorio y mínimo de 50 caracteres y máximo de 2000 caracteres '
     )
       .notEmpty()
       .isLength({ min: 50, max: 2000 }),
+    check('date', 'Fecha de inicio es obligatoria').custom(
+      isDate
+    ),
     validarCampos,
   ],
   constroller.editStorie
 );
-router.delete("/:id", constroller.deleteStorie);
+router.delete('/:id', constroller.deleteStorie);
 module.exports = router;

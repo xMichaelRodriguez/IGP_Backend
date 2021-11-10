@@ -1,11 +1,7 @@
 const { Schema, model } = require('mongoose');
-const mongoosePagination = require('mongoose-paginate-v2');
-const storiesSchema = new Schema({
+const mongoosePaginate = require('mongoose-paginate-v2');
+const CommicSchema = new Schema({
   title: {
-    type: String,
-    require: true,
-  },
-  body: {
     type: String,
     require: true,
   },
@@ -15,12 +11,12 @@ const storiesSchema = new Schema({
     require: true,
     default: new Date(),
   },
-  imageUrl: {
-    type: String,
+  coverPage: {
+    type: Object,
     require: true,
   },
-  publicImg_id: {
-    type: String,
+  gallery: {
+    type: Array,
     require: true,
   },
   user: {
@@ -30,13 +26,11 @@ const storiesSchema = new Schema({
   },
 });
 
-storiesSchema.method('toJSON', function () {
+CommicSchema.method('toJSON', function () {
   const { __v, _id, ...object } = this.toObject();
   object.id = _id;
   return object;
 });
 
-// load Pagination
-storiesSchema.plugin(mongoosePagination);
-
-module.exports = model('Story', storiesSchema);
+CommicSchema.plugin(mongoosePaginate);
+module.exports = model('Commic', CommicSchema);

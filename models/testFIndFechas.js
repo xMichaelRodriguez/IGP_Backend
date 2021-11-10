@@ -1,6 +1,6 @@
 const { Schema, model } = require('mongoose');
 const mongoosePaginate = require('mongoose-paginate-v2');
-const noticeSchema = new Schema({
+const testDatesSchema = new Schema({
   title: {
     type: String,
     require: true,
@@ -12,7 +12,7 @@ const noticeSchema = new Schema({
   date: {
     type: String,
     require: true,
-    default: new Date(),
+    default: new Date().toISOString(),
   },
 
   user: {
@@ -22,11 +22,11 @@ const noticeSchema = new Schema({
   },
 });
 
-noticeSchema.method('toJSON', function () {
+testDatesSchema.method('toJSON', function () {
   const { __v, _id, ...object } = this.toObject();
   object.id = _id;
   return object;
 });
 
-noticeSchema.plugin(mongoosePaginate);
-module.exports = model('Notice', noticeSchema);
+testDatesSchema.plugin(mongoosePaginate);
+module.exports = model('testDates', testDatesSchema);
