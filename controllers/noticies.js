@@ -1,5 +1,6 @@
 const { response } = require('express');
 const Notice = require('../models/notice');
+const TestDates = require('../models/testFIndFechas')
 const getNoticies = async (req, res = response) => {
   try {
     let { page, startDate, endDate } = req.query;
@@ -35,19 +36,25 @@ const getNoticies = async (req, res = response) => {
 
       noticies = await Notice.paginate(query, options);
     } else {
-      const startFormat = new Date(startDate).toLocaleDateString('es-ES')
-      const endFormat = new Date(endDate).toLocaleDateString('es-ES')
+      const query = {};
+      const startFormatDate = new Date(startDate).toISOString()
+      const endFormatDate = new Date(endDate).toISOString()
 
-      query = {}
+
+      noticies = await Notice.find()
       noticies = await Notice.paginate(query, options);
       const filtered = noticies.docs.filter(notice => {
-        const dates = new Date(notice.date).toLocaleDateString('es-ES');
+        const dates = new Date(notice.date).toISOString().split('T')[0]
+        const startDate = startFormatDate.split('T')[0];
+        const endDate = endFormatDate.split('T')[0]
 
-        return dates >= startFormat && dates <= endFormat
+
+        return dates >= startDate && dates <= endDate
       })
+
       noticies = {
         docs: [...filtered],
-        todalDocs: noticies.totalDocs, totalPages: noticies.totalPages, nexPage: noticies.nextPage, prevPage: noticies.prevPage
+        todalDocs: noticies.totalDocs, totalPages: noticies.totalPages, nextPage: noticies.nextPage, prevPage: noticies.prevPage
       }
     }
 
@@ -59,7 +66,7 @@ const getNoticies = async (req, res = response) => {
     return res.status(200).json({
       ok: true,
 
-      noticies: noticies.docs,
+      noticies: noticies.docs.sort(),
       totalDocs: noticies.totalDocs,
       totalPages: noticies.totalPages,
       prevPage: noticies.prevPage,
@@ -67,6 +74,7 @@ const getNoticies = async (req, res = response) => {
     });
 
   } catch (error) {
+    console.log(error)
     return res.status(500).json({
       ok: false,
       msg: 'Algo salio mal',
