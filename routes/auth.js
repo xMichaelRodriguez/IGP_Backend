@@ -10,7 +10,7 @@ const validarCampos = require("../helpers/validar-campos");
 const { check } = require("express-validator");
 const { validarJWT } = require("../middleware/validar-jwt.js");
 const router = Router();
-
+router.post('/subscription',constroller.subscription)
 router.post(
   "/",
   [
