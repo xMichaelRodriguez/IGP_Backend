@@ -12,8 +12,7 @@ const whiteList = [
   'https://uvs.netlify.app',
   'http://localhost:5000',
   'http://localhost:4000',
-  'http://192.168.1.5:3000',
-  'https://sharp-meninsky-bb445f.netlify.app/',
+   'http://192.168.1.5:3000',
   'http://localhost:3000',
 ];
 const corsOptions = {

@@ -3,7 +3,8 @@ const bcrypt = require('bcryptjs')
 
 const User = require('../models/auth.js')
 const { generarJWT } = require('../helpers/jwt.js')
-
+const webpush = require('../helpers/webPush');
+let pushSubscripton;
 const login = async (req, res = response) => {
   const { email, password } = req.body
 
@@ -62,9 +63,10 @@ const revalidarToken = async (req, res = response) => {
   })
 }
 
-const subscription = (req, res) =>{
-  console.log(req.body)
-  return res.status(200).json()
+const subscription = (req, res) => {
+  pushSubscripton = req.body;
+  console.log(pushSubscripton);
+  return res.status(200).json({message:'hola mundo'})
 } 
 module.exports = {
   login,

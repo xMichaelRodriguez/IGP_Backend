@@ -25,6 +25,7 @@ router.post(
   ],
   constroller.login
 );
+
 router.get("/renew", validarJWT, constroller.revalidarToken);
 
 module.exports = router;
