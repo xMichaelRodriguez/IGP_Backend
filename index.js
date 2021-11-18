@@ -1,20 +1,27 @@
 const express = require('express');
 const socketIo = require('socket.io')
+const morgan =require('morgan')
 // Crear el servidor de express
 const app = express();
 const server = require('http').createServer(app);
 
-// const morgan = require('morgan');
-const dotenv = require('dotenv').config();
+// config
+require('dotenv').config();
 const cors = require('cors');
 const whiteList = [
   'https://uvs.netlify.app',
-  'http://localhost:3000',
+  'http://localhost:5000',
   'http://localhost:4000',
+  'http://192.168.1.5:3000',
+  'https://sharp-meninsky-bb445f.netlify.app/',
+  'http://localhost:3000',
 ];
 const corsOptions = {
   origin: whiteList,
 };
+
+const webpush = require('./helpers/webPush')
+
 
 //Rutas
 const authRouter = require('./routes/auth.js');
@@ -36,7 +43,7 @@ const io = socketIo(server, {
     corsOptions, methods: ['GET', 'POST', 'PUT', 'DELETE']
   }
 })
-// app.use(morgan('dev'))
+app.use(morgan('dev'))
 
 // Lectura y parseo del body
 app.use(express.json());

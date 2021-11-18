@@ -61,7 +61,13 @@ const revalidarToken = async (req, res = response) => {
     name,
   })
 }
+
+const subscription = (req, res) =>{
+  console.log(req.body)
+  return res.status(200).json()
+} 
 module.exports = {
   login,
   revalidarToken,
+  subscription
 }
