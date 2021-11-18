@@ -19,9 +19,6 @@ const corsOptions = {
   origin: whiteList,
 };
 
-const webpush = require('./helpers/webPush')
-
-
 //Rutas
 const authRouter = require('./routes/auth.js');
 const storiesRouter = require('./routes/stories');
@@ -42,14 +39,13 @@ const io = socketIo(server, {
     corsOptions, methods: ['GET', 'POST', 'PUT', 'DELETE']
   }
 })
-app.use(morgan('dev'))
+
 
 // Lectura y parseo del body
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(morgan('dev'))
 
-//socket.io
-//socket.connect(server);
 
 // Rutas
 app.use('/api/auth', authRouter);
