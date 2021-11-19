@@ -72,6 +72,7 @@ const getStoriesPagination = async (req, res) => {
         .json({ ok: false, msg: 'No hay historias' });
     }
 
+
     return res.status(200).json({
       ok: true,
       stories: stories.docs,
@@ -134,7 +135,15 @@ const newStorie = async (req, res = response) => {
     const storySaved = await story.save();
 
     await fs.unlink(path);
-
+    // Payload Notification
+    const payload = JSON.stringify({
+      title: "Nueva Notificación de Una Vida Segura!",
+      message: `Nueva Historia: ${storySaved.title}`
+    });
+    const result = await webPush.sendNotification(req.app.locals?.pushSubscripton, payload)
+    console.group('PUSH NOTIFICATION')
+    console.log(result)
+    console.groupEnd()
     return res.json({
       ok: true,
       story: storySaved,

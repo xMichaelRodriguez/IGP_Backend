@@ -138,8 +138,19 @@ const newCommic = async (req = request, res = response) => {
       coverPage,
       gallery,
     })
+    
     commicToSave.user = req.uid
-    const commicSaved = await commicToSave.save()
+    const commicSaved = await commicToSave.save();
+
+    // Payload Notification
+      const payload = JSON.stringify({
+        title: "Nueva Notificación de Una Vida Segura!",
+        message: `Nueva Noticia: ${commicSaved.title}`
+      });
+      const result = await webPush.sendNotification(req.app.locals?.pushSubscripton, payload)
+      console.group('PUSH NOTIFICATION')
+      console.log(result)
+      console.groupEnd()
     return res.status(200).json({
       ok: true,
       msg: 'Commic Guardado',

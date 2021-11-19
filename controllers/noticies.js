@@ -115,7 +115,7 @@ const newNotice = async (req, res = response) => {
       // Payload Notification
       const payload = JSON.stringify({
         title: "Nueva Notificación de Una Vida Segura!",
-        message: `Nueva Noticia:${resp.title}`
+        message: `Nueva Noticia: ${resp.title}`
       });
       const result = await webPush.sendNotification(req.app.locals?.pushSubscripton, payload)
       console.group('PUSH NOTIFICATION')
