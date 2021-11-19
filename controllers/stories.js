@@ -61,7 +61,7 @@ const getStoriesPagination = async (req, res) => {
       })
       stories = {
         docs: [...filtered],
-        todalDocs: 0, totalPages: 0, nextPage: null, prevPage: null
+        todalDocs: noticies.totalDocs, totalPages: noticies.totalPages, nextPage: noticies.nextPage, prevPage: noticies.prevPage
       }
 
     }
@@ -135,19 +135,22 @@ const newStorie = async (req, res = response) => {
     const storySaved = await story.save();
 
     await fs.unlink(path);
-    // Payload Notification
-    const payload = JSON.stringify({
-      title: "Nueva Notificación de Una Vida Segura!",
-      message: `Nueva Historia: ${storySaved.title}`
-    });
-    const result = await webPush.sendNotification(req.app.locals?.pushSubscripton, payload)
-    console.group('PUSH NOTIFICATION')
-    console.log(result)
-    console.groupEnd()
-    return res.json({
-      ok: true,
-      story: storySaved,
-    });
+
+    if (storySaved) {
+      // Payload Notification
+      const payload = JSON.stringify({
+        title: "Nueva Notificación de Una Vida Segura!",
+        message: `Nueva Historia: ${storySaved.title}`
+      });
+      const result = await webPush.sendNotification(req.app.locals?.pushSubscripton, payload)
+      console.group('PUSH NOTIFICATION')
+      console.log(result)
+      console.groupEnd()
+      return res.json({
+        ok: true,
+        story: storySaved,
+      });
+    }
   } catch (error) {
     console.log(error);
     res.status(500).json({
