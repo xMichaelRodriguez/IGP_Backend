@@ -1,8 +1,8 @@
 const { response } = require('express');
 const Notice = require('../models/notice');
-const webPush=require('../helpers/webPush');
+const webPush = require('../helpers/webPush');
 const getNoticies = async (req, res = response) => {
-  
+
   try {
     let { page, startDate, endDate } = req.query;
 
@@ -64,16 +64,12 @@ const getNoticies = async (req, res = response) => {
         .status(404)
         .json({ ok: false, msg: 'No hay noticias' });
     }
-  // Payload Notification
-  const payload = JSON.stringify({
-    title: "Nueva Notificación de Una Vida Segura!",
-    message:"Hay una nueva noticia, puede que te interese!" 
-  });
-    if (req.app.locals.pushSubscripton) {
-      console.log(req.app.locals)
-     return  await webPush.sendNotification(req.app.locals?.pushSubscripton,payload)
-    }
-  
+    // Payload Notification
+    const payload = JSON.stringify({
+      title: "Nueva Notificación de Una Vida Segura!",
+      message: "Hay una nueva noticia, puede que te interese!"
+    });
+
     return res.status(200).json({
       ok: true,
 
@@ -122,6 +118,9 @@ const newNotice = async (req, res = response) => {
     const resp = await newNotices.save();
 
     if (resp) {
+      if (req.app.locals?.pushSubscripton) {
+        return await webPush.sendNotification(req.app.locals?.pushSubscripton, payload)
+      }
       return res.status(200).json({
         ok: true,
         noticies: resp,
