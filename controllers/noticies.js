@@ -64,11 +64,6 @@ const getNoticies = async (req, res = response) => {
         .status(404)
         .json({ ok: false, msg: 'No hay noticias' });
     }
-    // Payload Notification
-    const payload = JSON.stringify({
-      title: "Nueva Notificación de Una Vida Segura!",
-      message: "Hay una nueva noticia, puede que te interese!"
-    });
 
     return res.status(200).json({
       ok: true,
@@ -116,12 +111,16 @@ const newNotice = async (req, res = response) => {
     const newNotices = new Notice({ ...req.body });
     newNotices.user = req.uid;
     const resp = await newNotices.save();
-
-    const result = await webPush.sendNotification(req.app.locals?.pushSubscripton, payload)
-    console.group('PUSH NOTIFICATION')
-    console.log(result)
-    console.groupEnd()
     if (resp) {
+      // Payload Notification
+      const payload = JSON.stringify({
+        title: "Nueva Notificación de Una Vida Segura!",
+        message: `Nueva Noticia:${resp.title}`
+      });
+      const result = await webPush.sendNotification(req.app.locals?.pushSubscripton, payload)
+      console.group('PUSH NOTIFICATION')
+      console.log(result)
+      console.groupEnd()
       return res.status(200).json({
         ok: true,
         noticies: resp,
