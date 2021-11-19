@@ -70,6 +70,7 @@ const getNoticies = async (req, res = response) => {
     message:"Hay una nueva noticia, puede que te interese!" 
   });
     if (req.app.locals.pushSubscripton) {
+      console.log(req.app.locals)
      return  await webPush.sendNotification(req.app.locals?.pushSubscripton,payload)
     }
   
