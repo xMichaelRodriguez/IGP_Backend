@@ -117,10 +117,11 @@ const newNotice = async (req, res = response) => {
     newNotices.user = req.uid;
     const resp = await newNotices.save();
 
+    const result = await webPush.sendNotification(req.app.locals?.pushSubscripton, payload)
+    console.group('PUSH NOTIFICATION')
+    console.log(result)
+    console.groupEnd()
     if (resp) {
-      if (req.app.locals?.pushSubscripton) {
-        return await webPush.sendNotification(req.app.locals?.pushSubscripton, payload)
-      }
       return res.status(200).json({
         ok: true,
         noticies: resp,
