@@ -75,7 +75,7 @@ const getStoriesPagination = async (req, res) => {
 
     return res.status(200).json({
       ok: true,
-      stories: stories.docs,
+      stories: stories.docs.sort(),
       totalDocs: stories.totalDocs,
       totalPages: stories.totalPages,
       prevPage: stories.prevPage,
