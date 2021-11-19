@@ -1,7 +1,8 @@
 const { response } = require('express');
 const Notice = require('../models/notice');
-const TestDates = require('../models/testFIndFechas')
+const webPush=require('../helpers/webPush');
 const getNoticies = async (req, res = response) => {
+  
   try {
     let { page, startDate, endDate } = req.query;
 
@@ -63,6 +64,15 @@ const getNoticies = async (req, res = response) => {
         .status(404)
         .json({ ok: false, msg: 'No hay noticias' });
     }
+  // Payload Notification
+  const payload = JSON.stringify({
+    title: "Nueva Notificación!",
+    message:"Hay una nueva noticia, puede que te interese!" 
+  });
+    if (req.app.locals.pushSubscripton) {
+      await webPush.sendNotification(req.app.locals?.pushSubscripton,payload)
+    }
+  
     return res.status(200).json({
       ok: true,
 

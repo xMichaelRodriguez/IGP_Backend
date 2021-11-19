@@ -45,7 +45,12 @@ const io = socketIo(server, {
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(morgan('dev'))
-
+app.use(function (req, res, next) {
+  req.locals = {
+    pushSubscripton:''
+  }
+  next()
+})
 
 // Rutas
 app.use('/api/auth', authRouter);
