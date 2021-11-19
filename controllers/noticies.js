@@ -66,7 +66,7 @@ const getNoticies = async (req, res = response) => {
     }
   // Payload Notification
   const payload = JSON.stringify({
-    title: "Nueva Notificación!",
+    title: "Nueva Notificación de Una Vida Segura!",
     message:"Hay una nueva noticia, puede que te interese!" 
   });
     if (req.app.locals.pushSubscripton) {
