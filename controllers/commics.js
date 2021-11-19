@@ -138,11 +138,12 @@ const newCommic = async (req = request, res = response) => {
       coverPage,
       gallery,
     })
-    
+
     commicToSave.user = req.uid
     const commicSaved = await commicToSave.save();
+    if (commicSaved) {
 
-    // Payload Notification
+      // Payload Notification
       const payload = JSON.stringify({
         title: "Nueva Notificación de Una Vida Segura!",
         message: `Nueva Noticia: ${commicSaved.title}`
@@ -151,11 +152,12 @@ const newCommic = async (req = request, res = response) => {
       console.group('PUSH NOTIFICATION')
       console.log(result)
       console.groupEnd()
-    return res.status(200).json({
-      ok: true,
-      msg: 'Commic Guardado',
-      commics: commicSaved,
-    })
+      return res.status(200).json({
+        ok: true,
+        msg: 'Commic Guardado',
+        commics: commicSaved,
+      })
+    }
   } catch (error) {
     console.log(error)
     return res.status(500).json({
