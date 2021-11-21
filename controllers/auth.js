@@ -26,7 +26,7 @@ const login = async (req, res = response) => {
     if (!validPassword) {
       return res.status(400).json({
         ok: false,
-        msg: 'Invalid password',
+        msg: 'Contraseña Invalida',
       })
     }
     // Generar JWT
@@ -44,7 +44,7 @@ const login = async (req, res = response) => {
     console.log(error)
     res.status(500).json({
       ok: false,
-      msg: 'something went wrong',
+      msg: 'Algo Salio Mal :(',
     })
   }
 }

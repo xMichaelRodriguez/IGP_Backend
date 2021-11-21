@@ -44,7 +44,7 @@ const io = socketIo(server, {
 // Lectura y parseo del body
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(morgan('dev'))
+app.use(morgan(':method :url :status'))
 app.use(function (req, res, next) {
   req.locals = {
     pushSubscripton:''
