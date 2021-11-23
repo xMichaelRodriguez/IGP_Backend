@@ -132,7 +132,6 @@ module.exports.listen = function (io, socket) {
       if (!forums) {
         socket.emit('loaded-active-forums', [])
       }
-
       // sacar comentarios de cada foro
       const comments = []
       forums.forEach((element) => {
@@ -140,45 +139,52 @@ module.exports.listen = function (io, socket) {
       })
 
       //llamar todos los commentarios de cada foro
-      let commentToCompare = []
-      for (const uid of comments) {
-        const resp = await CommentsForum.find({
-          forumId: uid,
-        })
-        if (resp) {
-          commentToCompare.push([
-            { foro: resp, totalComments: resp.length },
-          ])
-        }
-      }
 
+      const commentToCompare = await Promise.all(await comments.map(async comment => {
+        const resp = await CommentsForum.find({ forumId: comment })
+        if (resp) {
+          return { foro: resp, totalComments: resp.length }
+        }
+
+      }))
       // sacamos el total de comentarios de cada foro
       let resp = []
       commentToCompare.forEach((currentValue) => {
-        resp.push(currentValue[0].totalComments)
-      })
-      //ordenamos y retornamos el numero mayor de los totales de comentarios de cada foro
-      const maxComments = resp.sort(comparar).pop()
 
-      //comparamos cada foro y verificamos si el maxComments que sacamos coincide
-      //  con un foro para luego retornar este
-      let forumActive = []
-      commentToCompare.forEach(async (element) => {
-        if (element[0].totalComments === maxComments) {
-          forumActive.push(...element[0].foro)
+        if (Object.entries(currentValue).length !== 0) {
+          resp.push(currentValue.totalComments)
         }
-      })
+        return resp
+      });
+      if (Object.entries(resp).length === 0) {
+        socket.emit(
+          'loaded-active-forums',
+          null
+        )
+      } else {
+        //ordenamos y retornamos el numero mayor de los totales de comentarios de cada foro
+        const maxComments = resp.sort(comparar).pop()
 
-      const forumToFind = forumActive.pop()
 
-      const forumUltimateActive = await Forums.findById(
-        forumToFind.forumId
-      )
+        //comparamos cada foro y verificamos si el maxComments que sacamos coincide
+        //  con un foro para luego retornar este
+        let forumActive = []
+        commentToCompare.forEach(async (element) => {
+          if (element.totalComments === maxComments) {
+            forumActive.push(...element.foro)
+          }
+        })
+        const forumToFind = forumActive.pop()
 
-      socket.emit(
-        'loaded-active-forums',
-        forumUltimateActive
-      )
+        const forumUltimateActive = await Forums.findById(
+          forumToFind?.forumId
+        )
+        socket.emit(
+          'loaded-active-forums',
+          forumUltimateActive
+        )
+      }
+
     } catch (error) {
       console.log(error)
       // return cb({ msg: `error interno ${error}`, forums: null })
@@ -286,8 +292,8 @@ module.exports.listen = function (io, socket) {
 
       const combineComments = await Promise.all(commentsOfForum.map(async comment => {
         const replyComments = await ReplyComments.find({ commentId: comment._id }).populate('user');
-        const commentsFilterd = await replyComments.filter(reply =>String(reply.commentId) === String(comment._id));
-        return { commentFather: comment,replyComments: commentsFilterd }
+        const commentsFilterd = await replyComments.filter(reply => String(reply.commentId) === String(comment._id));
+        return { commentFather: comment, replyComments: commentsFilterd }
       }))
       socket.emit('comments-loaded', combineComments)
 
