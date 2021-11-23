@@ -1,6 +1,7 @@
 const CommentsForum = require('./models/commentsForum')
 const ForumUser = require('./models/forum')
 const Forums = require('./models/forums')
+const ReplyComments = require('./models/ReplyComments')
 
 module.exports.listen = function (io, socket) {
   socket.on('register', async (data, cb) => {
@@ -242,13 +243,54 @@ module.exports.listen = function (io, socket) {
     }
   })
 
+  socket.on('reply-comment', async (data, cb) => {
+    const { commentBox, commentId, user } = data;
+
+    if (!commentBox) {
+      cb({
+        msg: 'falta parametro comentario',
+        comment: null,
+      })
+    }
+    if (!commentId) {
+      cb({
+        msg: 'falta parametro commentId',
+        comment: null,
+      })
+    }
+    if (!user) {
+      cb({ msg: 'falta parametro user', comment: null })
+    }
+
+    const replyCommentToSave = new ReplyComments({ comment: commentBox, commentId, user })
+    try {
+      const reply = await replyCommentToSave.save();
+      const replyComment = await ReplyComments.findOne({
+        commentId,
+        _id: reply._id
+      }).populate('user');
+
+      cb({ msg: "", replies: replyComment })
+    } catch (error) {
+      console.log(error)
+      cb({ msg: 'Algo Salio Mal :(', replies: null })
+    }
+  })
   socket.on('load-comments', async (data) => {
     try {
       const commentsOfForum = await CommentsForum.find({
         forumId: data,
-      }).populate('user')
+      }).populate('user');
 
-      socket.emit('comments-loaded', commentsOfForum)
+      if (!commentsOfForum) return [];
+
+      const combineComments = await Promise.all(commentsOfForum.map(async comment => {
+        const replyComments = await ReplyComments.find({ commentId: comment._id }).populate('user');
+        const commentsFilterd = await replyComments.filter(reply =>String(reply.commentId) === String(comment._id));
+        return { commentFather: comment,replyComments: commentsFilterd }
+      }))
+      socket.emit('comments-loaded', combineComments)
+
     } catch (error) {
       console.log(error)
     }
